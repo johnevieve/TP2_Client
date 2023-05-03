@@ -1,43 +1,23 @@
 import './style.css';
 import axios from 'axios';
 
-// JS - Axios
-
 let token = 'er81NiUqmlTkgnr2euJh3VSJwKmIKNsb';
 
 const instanceAxios = axios.create({
-    baseURL: 'https://api.giphy.com/v1/gifs/',
+    baseURL: 'http://localhost/battleship-ia/parties',
     params: { 'api_key' : token }
 });
 
-const config = {
-    params: {
-        tag: 'burrito'
-    }
-};
-
-instanceAxios.get('random', config)
-    .then(response => {
-        let imageSrc = response?.data?.data?.images?.fixed_height?.url;
-
-        if (imageSrc) {
-            let image = document.createElement('img');
-            image.src = imageSrc;
-            document.body.appendChild(image);
-        }
-    })
-    .catch(error => console.log('error', error));
-
-async function getTrendings() {
+/*async function getTrendings() {
     try {
         return await instanceAxios.get('trending', { params: { limit: 10 }});
     } catch (error) {
         // ...
         console.error(error);
     }
-}
+}*/
 
-async function getGifURL(id) {
+/*async function getGifURL(id) {
     try {
         const response = await instanceAxios.get(id);
         return response?.data?.data?.images?.fixed_height?.url;
@@ -45,9 +25,9 @@ async function getGifURL(id) {
         // ...
         console.error(error);
     }
-}
+}*/
 
-function refreshImage() {
+/*function refreshImage() {
     getTrendings().then(response => {
         let firstId = response?.data?.data[0]?.id;
 
@@ -61,52 +41,92 @@ function refreshImage() {
             })
         }
     })
+}*/
+
+//refreshImage();
+
+const bateaux = {
+    PORTE_AVIONS: 5,
+    CUIRASSÉ: 4,
+    DESTROYER: 3,
+    SOUS_MARIN: 3,
+    PATROUILLEUR: 2
 }
 
-refreshImage();
+const resultat = {
+    0: "à l'eau",
+    1: "touché",
+    2: "porte-avions coulé",
+    3: "cuirasse coulée",
+    4: "destroyer coulé",
+    5: "sous-marin coulé",
+    6: "patrouilleur coulé"
+}
 
-/*instanceAxios.interceptors.request.use(function (config) {
-    // Faire quelque chose avant que la requête ne soit envoyée
-    return config;
-}, error => Promise.reject(error));
-    instanceAxios.interceptors.response.use(function (response) {
-    // Code 2XX
-    // Faire quelque chose avec les données de la réponse
-    return response;
-}, function (error) {
-    // Autre que code 2XX
-    // Faire quelque chose avec les données de l’erreur
-    return Promise.reject(error);
-});*/
+var idPartie = null;
+var nomAdversaire = "IA";
 
-async function nouvellePartie() {
+var posBateauxJoueur= {}
+var posBateauxIA = {};
+
+var tableauJoueur = {}
+var tableauIA = {}
+
+async function creationPartie() {
     try {
-        
+        const response = await instanceAxios.post(nomAdversaire);
+        idPartie = response?.data?.data?.id;
+        posBateauxIA = response?.data?.data?.bateaux;
+
+        document.getElementById('id_partie').innerHTML = "Partie ID : " + idPartie;
+        document.getElementById('nom_joueur').innerHTML = "Joueur : " + "Joueur 1";
+        document.getElementById('nom_adversaire').innerHTML = "Adversaire : " + nomAdversaire;
     } catch (error) {
-        
+        console.error(error);
     }
 }
 
 async function terminerPartie() {
     try {
-        
+        const response = await instanceAxios.delete(idPartie);
     } catch (error) {
-        
-    }
-}
-
-async function lancerMissile() {
-    try {
-        
-    } catch (error) {
-        
+        console.error(error);
     }
 }
 
 async function recevoirMissile() {
     try {
-        
+        const response = await instanceAxios.post(idPartie + '/missiles');
+        let coordonnee = response?.data?.data?.coordonnee;
+        resultatMissile(coordonnee);
     } catch (error) {
-        
+        console.error(error);
     }
 }
+
+async function resultatMissile(coordonnee) {
+    try {
+        let resultat = verifierPositionBateau(coordonnee);
+        const response = await instanceAxios.put(idPartie + '/missiles/' + coordonnee, resultat);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function nouvellePartie() {    
+    let bouton = document.getElementById('boutton_partie');
+    //bouton.
+
+    bouton.innerHTML = "Terminée Partie";
+    bouton.onclick(terminerPartie());
+}
+
+function verifierPlacementPositionBateau() {
+
+}
+
+function verifierPositionBateau(coordonnee) {
+
+}
+
+creationPartie();
