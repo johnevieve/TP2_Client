@@ -64,23 +64,18 @@ const resultat = {
 }
 
 var idPartie = null;
+var nomJoueur = "Joueur 1"
 var nomAdversaire = "IA";
 
 var posBateauxJoueur= {}
-var posBateauxIA = {};
+var posBateauxAdversaire = {};
 
-var tableauJoueur = {}
-var tableauIA = {}
+var missilesJoueur = {}
+var missilesAdversaire = {}
 
 async function creationPartie() {
     try {
-        const response = await instanceAxios.post(nomAdversaire);
-        idPartie = response?.data?.data?.id;
-        posBateauxIA = response?.data?.data?.bateaux;
-
-        document.getElementById('id_partie').innerHTML = "Partie ID : " + idPartie;
-        document.getElementById('nom_joueur').innerHTML = "Joueur : " + "Joueur 1";
-        document.getElementById('nom_adversaire').innerHTML = "Adversaire : " + nomAdversaire;
+        return await instanceAxios.post(nomAdversaire);
     } catch (error) {
         console.error(error);
     }
@@ -88,7 +83,7 @@ async function creationPartie() {
 
 async function terminerPartie() {
     try {
-        const response = await instanceAxios.delete(idPartie);
+        return await instanceAxios.delete(idPartie);
     } catch (error) {
         console.error(error);
     }
@@ -98,13 +93,13 @@ async function recevoirMissile() {
     try {
         const response = await instanceAxios.post(idPartie + '/missiles');
         let coordonnee = response?.data?.data?.coordonnee;
-        resultatMissile(coordonnee);
+        envoieResultatMissile(coordonnee);
     } catch (error) {
         console.error(error);
     }
 }
 
-async function resultatMissile(coordonnee) {
+async function envoieResultatMissile(coordonnee) {
     try {
         let resultat = verifierPositionBateau(coordonnee);
         const response = await instanceAxios.put(idPartie + '/missiles/' + coordonnee, resultat);
@@ -113,12 +108,30 @@ async function resultatMissile(coordonnee) {
     }
 }
 
-function nouvellePartie() {    
-    let bouton = document.getElementById('boutton_partie');
-    //bouton.
+function nouvellePartie() {   
+    creationPartie().then(
+        response => {
+            idPartie = response?.data?.data?.id;
+            posBateauxAdversaire = response?.data?.data?.bateaux;
 
-    bouton.innerHTML = "Terminée Partie";
-    bouton.onclick(terminerPartie());
+            document.getElementById('id_partie').innerHTML = "Partie ID : " + idPartie;
+            document.getElementById('nom_joueur').innerHTML = "Joueur : " + nomJoueur;
+            document.getElementById('nom_adversaire').innerHTML = "Adversaire : " + nomAdversaire;
+
+            let bouton = document.getElementById('boutton_partie');
+
+            bouton.innerHTML = "Terminée Partie";
+            bouton.onclick(terminerPartie());
+        }
+    );
+}
+
+function initierTableaux(nomId) {
+    for (let x = 1; x < 11; x++) {
+        for (let y = 1; y < 11; y++) {
+
+        }
+    }
 }
 
 function verifierPlacementPositionBateau() {
@@ -128,5 +141,3 @@ function verifierPlacementPositionBateau() {
 function verifierPositionBateau(coordonnee) {
 
 }
-
-creationPartie();
