@@ -127,9 +127,28 @@ function nouvellePartie() {
 }
 
 function initierTableaux(nomId) {
-    for (let x = 1; x < 11; x++) {
-        for (let y = 1; y < 11; y++) {
+    let tableau = document.getElementById(nomId);
+    let element;
 
+    for (let i = 0; i <= 10; i++) {
+        element = document.createElement("div");
+
+        if (i != 0) {
+            element.innerHTML = i;
+        }
+
+        tableau.appendChild(element);
+    }
+
+    for (let x = A; x <= J; x++) {
+        element = document.createElement("div");
+        element.innerHTML = x;
+        tableau.appendChild(element);
+
+        for (let y = 1; y <= 10; y++) {
+            element = document.createElement("div");
+            element.id = x + "-" + y;
+            tableau.appendChild(element);
         }
     }
 }
