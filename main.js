@@ -46,11 +46,11 @@ const instanceAxios = axios.create({
 //refreshImage();
 
 const bateaux = {
-    PORTE_AVIONS: 5,
-    CUIRASSÉ: 4,
-    DESTROYER: 3,
-    SOUS_MARIN: 3,
-    PATROUILLEUR: 2
+    porteAvions: 5,
+    cuirasse: 4,
+    destroyer: 3,
+    sousMarin: 3,
+    patrouilleur: 2
 }
 
 const resultat = {
@@ -67,17 +67,19 @@ var idPartie = null;
 var nomJoueur = "Joueur 1"
 var nomAdversaire = "IA";
 
-var posBateauxJoueur= {}
+var posBateauxJoueur = {}
 var posBateauxAdversaire = {};
 
 var missilesJoueur = {}
 var missilesAdversaire = {}
 
+var directionPlacement = true;
+
 async function creationPartie() {
     try {
         return await instanceAxios.post(nomAdversaire);
     } catch (error) {
-        console.error(error);
+        afficherMessageErreur(error);
     }
 }
 
@@ -85,7 +87,7 @@ async function terminerPartie() {
     try {
         return await instanceAxios.delete(idPartie);
     } catch (error) {
-        console.error(error);
+        afficherMessageErreur(error);
     }
 }
 
@@ -95,7 +97,7 @@ async function recevoirMissile() {
         let coordonnee = response?.data?.data?.coordonnee;
         envoieResultatMissile(coordonnee);
     } catch (error) {
-        console.error(error);
+        afficherMessageErreur(error);
     }
 }
 
@@ -104,7 +106,7 @@ async function envoieResultatMissile(coordonnee) {
         let resultat = verifierPositionBateau(coordonnee);
         const response = await instanceAxios.put(idPartie + '/missiles/' + coordonnee, resultat);
     } catch (error) {
-        console.error(error);
+        afficherMessageErreur(error);
     }
 }
 
@@ -121,17 +123,21 @@ function nouvellePartie() {
             let bouton = document.getElementById('boutton_partie');
 
             bouton.innerHTML = "Terminée Partie";
-            bouton.onclick(terminerPartie());
+            bouton.onclick(terminerPartie);
+
+            initierTableaux("tableau_joueur");
+            initierTableaux("tableau_adversaire");
         }
     );
 }
 
-function initierTableaux(nomId) {
-    let tableau = document.getElementById(nomId);
+function initierTableaux(divId) {
+    let tableau = document.getElementById(divId);
     let element;
 
     for (let i = 0; i <= 10; i++) {
         element = document.createElement("div");
+        element.id = "border";
 
         if (i != 0) {
             element.innerHTML = i;
@@ -142,21 +148,45 @@ function initierTableaux(nomId) {
 
     for (let x = A; x <= J; x++) {
         element = document.createElement("div");
+        element.id = "border";
         element.innerHTML = x;
         tableau.appendChild(element);
 
         for (let y = 1; y <= 10; y++) {
             element = document.createElement("div");
             element.id = x + "-" + y;
+            element.addEventListener('mouseover', verifierPlacementBateau);
             tableau.appendChild(element);
         }
     }
 }
 
-function verifierPlacementPositionBateau() {
+function verifierPlacementBateau() {
+    let indexBateau = 0;
 
+    if (indexBateau > 4) {
+        let tableauJoueur = document.getElementById("tableau_joueur").querySelectorAll(!"border");
+        let tableauAdversaire = document.getElementById("tableau_adversaire").querySelectorAll(!"border");
+
+        tableauJoueur.forEach((element) => {
+            element.removeEventListener('mouseover', verifierPlacementBateau);
+        })
+
+        tableauAdversaire.forEach((element) => {
+            element.addEventListener('click', verifierPositionBateau);
+        })
+    }
 }
 
 function verifierPositionBateau(coordonnee) {
 
+}
+
+function changerDirectionPlacementBateau() {
+    directionPlacement = !directionPlacement;
+}
+
+function afficherMessageErreur(error) {
+    document.getElementById("error_message").innerHTML = error.message;
+    console.error(error);
 }
