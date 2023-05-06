@@ -73,7 +73,9 @@ var posBateauxAdversaire = {};
 var missilesJoueur = {}
 var missilesAdversaire = {}
 
+var indexBateau = 0;
 var directionPlacement = true;
+var estPlacable = false;
 
 async function creationPartie() {
     try {
@@ -93,7 +95,7 @@ async function terminerPartie() {
 
 async function recevoirMissile() {
     try {
-        const response = await instanceAxios.post(idPartie + '/missiles');
+        const response = await instanceAxios.post(idPartie + "/missiles");
         let coordonnee = response?.data?.data?.coordonnee;
         envoieResultatMissile(coordonnee);
     } catch (error) {
@@ -104,7 +106,7 @@ async function recevoirMissile() {
 async function envoieResultatMissile(coordonnee) {
     try {
         let resultat = verifierPositionBateau(coordonnee);
-        const response = await instanceAxios.put(idPartie + '/missiles/' + coordonnee, resultat);
+        const response = await instanceAxios.put(idPartie + "/missiles/" + coordonnee, resultat);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -116,11 +118,11 @@ function nouvellePartie() {
             idPartie = response?.data?.data?.id;
             posBateauxAdversaire = response?.data?.data?.bateaux;
 
-            document.getElementById('id_partie').innerHTML = "Partie ID : " + idPartie;
-            document.getElementById('nom_joueur').innerHTML = "Joueur : " + nomJoueur;
-            document.getElementById('nom_adversaire').innerHTML = "Adversaire : " + nomAdversaire;
+            document.getElementById("id_partie").innerHTML = "Partie ID : " + idPartie;
+            document.getElementById("nom_joueur").innerHTML = "Joueur : " + nomJoueur;
+            document.getElementById("nom_adversaire").innerHTML = "Adversaire : " + nomAdversaire;
 
-            let bouton = document.getElementById('boutton_partie');
+            let bouton = document.getElementById("boutton_partie");
 
             bouton.innerHTML = "Terminée Partie";
             bouton.onclick(terminerPartie);
@@ -137,7 +139,6 @@ function initierTableaux(divId) {
 
     for (let i = 0; i <= 10; i++) {
         element = document.createElement("div");
-        element.id = "border";
 
         if (i != 0) {
             element.innerHTML = i;
@@ -148,38 +149,49 @@ function initierTableaux(divId) {
 
     for (let x = A; x <= J; x++) {
         element = document.createElement("div");
-        element.id = "border";
         element.innerHTML = x;
         tableau.appendChild(element);
 
         for (let y = 1; y <= 10; y++) {
             element = document.createElement("div");
-            element.id = x + "-" + y;
-            element.addEventListener('mouseover', verifierPlacementBateau);
+            element.target = x + "-" + y;
+            element.addEventListener("mouseover", verifierPlacementBateau);
+            element.addEventListener("click", verifierBateauEstPlacable);
             tableau.appendChild(element);
         }
     }
 }
 
 function verifierPlacementBateau() {
-    let indexBateau = 0;
+    
 
     if (indexBateau > 4) {
-        let tableauJoueur = document.getElementById("tableau_joueur").querySelectorAll(!"border");
-        let tableauAdversaire = document.getElementById("tableau_adversaire").querySelectorAll(!"border");
+        let tableauJoueur = document.getElementById("tableau_joueur").querySelectorAll("[target]");
+        let tableauAdversaire = document.getElementById("tableau_adversaire").querySelectorAll("[target]");
 
         tableauJoueur.forEach((element) => {
-            element.removeEventListener('mouseover', verifierPlacementBateau);
+            element.removeEventListener("mouseover", verifierPlacementBateau);
+            element.removeEventListener("click", verifierBateauEstPlacable);
         })
 
         tableauAdversaire.forEach((element) => {
-            element.addEventListener('click', verifierPositionBateau);
+            element.addEventListener("click", lancerMissile(element.id));
         })
     }
 }
 
+function lancerMissile(coordonnee) {
+
+}
+
 function verifierPositionBateau(coordonnee) {
 
+}
+
+function verifierBateauEstPlacable() {
+    if (estPlacable) {
+
+    }
 }
 
 function changerDirectionPlacementBateau() {
