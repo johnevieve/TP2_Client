@@ -163,8 +163,6 @@ function initierTableaux(divId) {
 }
 
 function verifierPlacementBateau() {
-    
-
     if (indexBateau > 4) {
         let tableauJoueur = document.getElementById("tableau_joueur").querySelectorAll("[target]");
         let tableauAdversaire = document.getElementById("tableau_adversaire").querySelectorAll("[target]");
@@ -188,10 +186,15 @@ function verifierPositionBateau(coordonnee) {
 
 }
 
-function verifierBateauEstPlacable() {
-    if (estPlacable) {
+function verifierBateauEstPlacable(coordonneesBateau) {
+    
+    coordonneesBateau.forEach(coordonnee => {
+        if (isset(posBateauxJoueur[coordonnee.x][coordonnee.y])) {
+            return false;
+        }
+    });
 
-    }
+    return true;
 }
 
 function changerDirectionPlacementBateau() {
