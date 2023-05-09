@@ -5,7 +5,7 @@ let token = 'er81NiUqmlTkgnr2euJh3VSJwKmIKNsb';
 
 const instanceAxios = axios.create({
     baseURL: 'http://localhost/battleship-ia/parties',
-    params: { 'api_key' : token }
+    params: { 'api_key': token }
 });
 
 /*async function getTrendings() {
@@ -112,7 +112,12 @@ async function envoieResultatMissile(coordonnee) {
     }
 }
 
-function nouvellePartie() {   
+var button = document.getElementById("bouton_nouvellePartie");
+button.addEventListener("click", nouvellePartie);
+
+function nouvellePartie() {
+    console.log("frite");
+
     creationPartie().then(
         response => {
             idPartie = response?.data?.data?.id;
@@ -131,6 +136,7 @@ function nouvellePartie() {
             initierTableaux("tableau_adversaire");
         }
     );
+    console.log("patate");
 }
 
 function initierTableaux(divId) {
@@ -183,13 +189,18 @@ function lancerMissile(coordonnee) {
 }
 
 function verifierPositionBateau(coordonnee) {
+    cord = coordonnee.split('-')
+    if (isset(posBateauxJoueur[cord[0]][cord[1]])) {
+        return true;
+    }
 
+    return false
 }
 
 function verifierBateauEstPlacable(coordonneesBateau) {
-    
     coordonneesBateau.forEach(coordonnee => {
-        if (isset(posBateauxJoueur[coordonnee.x][coordonnee.y])) {
+        cord = coordonnee.split('-')
+        if (isset(posBateauxJoueur[cord[0]][cord[1]])) {
             return false;
         }
     });
@@ -205,3 +216,9 @@ function afficherMessageErreur(error) {
     document.getElementById("error_message").innerHTML = error.message;
     console.error(error);
 }
+
+
+export const fonctions = {
+    nouvellePartie,
+    changerDirectionPlacementBateau
+};
