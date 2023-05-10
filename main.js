@@ -22,6 +22,7 @@ const resultat = {
     6: "patrouilleur coulé"
 }
 
+const taillePlateau = 10;
 var idPartie;
 var nomJoueur = "Joueur 1"
 var nomAdversaire = "IA";
@@ -39,7 +40,7 @@ var indexBateau = 0;
 var directionPlacement = true;
 var estPlacable = false;
 
-// tester et corriger
+// marche
 async function creationPartie() {
     try {
         return await axios.post(url_api_joueur_ia, { adversaire: nomAdversaire }, { headers: { "Authorization": `Bearer ${token}` } });
@@ -88,6 +89,7 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
     nouvellePartie();
 });
 
+// marche
 async function nouvellePartie() {
     creationPartie().then(
         response => {
@@ -109,57 +111,63 @@ async function nouvellePartie() {
                     posBateauxAdversaire[x.charCodeAt(0) - 'A'.charCodeAt(0)][y - 1] = true;
                 }
             }
-            
+
             document.getElementById("formulaire").remove();
+
             const idPartieEl = document.createElement('div');
             idPartieEl.innerHTML = "Partie ID : " + idPartie;
-            document.body.appendChild(idPartieEl);
+            document.body.insertBefore(idPartieEl, document.body.firstChild);
 
             const nomJoueurEl = document.createElement('div');
             nomJoueurEl.innerHTML = "Joueur : " + nomJoueur;
-            document.body.appendChild(nomJoueurEl);
+            idPartieEl.insertAdjacentElement('afterend', nomJoueurEl);
 
             const nomAdversaireEl = document.createElement('div');
             nomAdversaireEl.innerHTML = "Adversaire : " + nomAdversaire;
-            document.body.appendChild(nomAdversaireEl);
+            nomJoueurEl.insertAdjacentElement('afterend', nomAdversaireEl);
 
             const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
             bouton.onclick = terminerPartie;
             document.body.appendChild(bouton);
 
-            
+            initierTableaux("tableau_joueur");
+            initierTableaux("tableau_adversaire");
         }
     );
 }
 
 function initierTableaux(divId) {
-    let tableau = document.getElementById(divId);
-    let element;
+    let div = document.getElementById(divId);
+    const table = document.createElement("table");
 
-    for (let i = 0; i <= 10; i++) {
-        element = document.createElement("div");
+    // Créer une rangée pour les lettres
+    const rowLetters = document.createElement("tr");
+    rowLetters.appendChild(document.createElement("th"));
+    for (let i = 0; i < 7; i++) {
+        const letter = String.fromCharCode(i + 65);
+        const th = document.createElement("th");
+        th.innerText = letter;
+        rowLetters.appendChild(th);
+    }
+    table.appendChild(rowLetters);
 
-        if (i != 0) {
-            element.innerHTML = i;
+    // Créer les autres rangées
+    for (let i = 1; i < 8; i++) {
+        const row = document.createElement("tr");
+        const th = document.createElement("th");
+        th.innerText = i;
+        row.appendChild(th);
+
+        for (let j = 0; j < 7; j++) {
+            const cell = document.createElement("td");
+            cell.setAttribute("id", `${String.fromCharCode(j + 65)}-${i}`);
+            row.appendChild(cell);
         }
-
-        tableau.appendChild(element);
+        table.appendChild(row);
     }
 
-    for (let x = A; x <= J; x++) {
-        element = document.createElement("div");
-        element.innerHTML = x;
-        tableau.appendChild(element);
-
-        for (let y = 1; y <= 10; y++) {
-            element = document.createElement("div");
-            element.target = x + "-" + y;
-            element.addEventListener("mouseover", verifierPlacementBateau);
-            element.addEventListener("click", verifierBateauEstPlacable);
-            tableau.appendChild(element);
-        }
-    }
+    div.appendChild(table);
 }
 
 function verifierPlacementBateau() {
