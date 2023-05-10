@@ -22,12 +22,15 @@ const resultat = {
     6: "patrouilleur coulé"
 }
 
-var idPartie = null;
+var idPartie;
 var nomJoueur = "Joueur 1"
 var nomAdversaire = "IA";
 
-var posBateauxJoueur = {}
-var posBateauxAdversaire = {};
+var bateauxJoueur = {}
+var bateauxAdversaire = {};
+
+var posBateauxJoueur = []
+var posBateauxAdversaire = [];
 
 var missilesJoueur = {}
 var missilesAdversaire = {}
@@ -46,7 +49,7 @@ async function creationPartie() {
 
 async function terminerPartie() {
     try {
-        return await axios.delete(url_api_joueur_ia + "/" + idPartie);
+        return await axios.delete(url_api_joueur_ia + "/" + idPartie, { headers: { "Authorization": `Bearer ${token}` } });
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -54,7 +57,7 @@ async function terminerPartie() {
 
 async function recevoirMissile() {
     try {
-        const response = await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles");
+        const response = await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles", { headers: { "Authorization": `Bearer ${token}` } });
         let coordonnee = response?.data?.data?.coordonnee;
         envoieResultatMissile(coordonnee);
     } catch (error) {
@@ -65,7 +68,10 @@ async function recevoirMissile() {
 async function envoieResultatMissile(coordonnee) {
     try {
         let resultat = verifierPositionBateau(coordonnee);
-        const response = await axios.put(url_api_joueur_ia + "/" + idPartie + "/missiles/" + coordonnee, resultat);
+        const response = await axios.put(
+            url_api_joueur_ia + "/" + idPartie + "/missiles/" + coordonnee,
+            resultat,
+            { headers: { "Authorization": `Bearer ${token}` } });
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -81,15 +87,30 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
     nouvellePartie();
 });
 
-function nouvellePartie() {
-
-
+async function nouvellePartie() {
     creationPartie().then(
         response => {
-            console.log(response);
             idPartie = response?.data?.data?.id;
-            posBateauxAdversaire = response?.data?.data?.bateaux;
 
+            bateauxAdversaire = response?.data?.data?.bateaux;
+
+            for (let i = 0; i < 10; i++) {
+                posBateauxAdversaire[i] = [];
+                for (let j = 0; j < 10; j++) {
+                    posBateauxAdversaire[i][j] = false;
+                }
+            }
+            console.log(bateauxAdversaire);
+            console.log(posBateauxAdversaire);
+            for (const [bateau, positions] of Object.entries(bateauxAdversaire)) {
+                for (const position of positions) {
+                    const [x, y] = position.split('-');
+                    posBateauxAdversaire[x.charCodeAt(0) - 'A'.charCodeAt(0)][y - 1] = true;
+                }
+            }
+
+            console.log(bateauxAdversaire);
+            console.log(posBateauxAdversaire);
             document.getElementById("id_partie").innerHTML = "Partie ID : " + idPartie;
             document.getElementById("nom_joueur").innerHTML = "Joueur : " + nomJoueur;
             document.getElementById("nom_adversaire").innerHTML = "Adversaire : " + nomAdversaire;
