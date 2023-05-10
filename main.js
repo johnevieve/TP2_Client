@@ -1,12 +1,9 @@
 import './style.css';
 import axios from 'axios';
 
-let token = 'er81NiUqmlTkgnr2euJh3VSJwKmIKNsb';
+let token;
 
-const instanceAxios = axios.create({
-    baseURL: 'http://localhost/battleship-ia/parties',
-    params: { 'api_key': token }
-});
+let instanceAxios;
 
 /*async function getTrendings() {
     try {
@@ -79,7 +76,8 @@ var estPlacable = false;
 
 async function creationPartie() {
     try {
-        return await instanceAxios.post(nomAdversaire);
+        //return await instanceAxios.post(nomAdversaire);
+        return await axios.post('http://localhost/api/battleship-ia/parties', nomAdversaire, instanceAxios);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -112,10 +110,22 @@ async function envoieResultatMissile(coordonnee) {
     }
 }
 
-var button = document.getElementById("bouton_nouvellePartie");
-button.addEventListener("click", nouvellePartie);
+var button = document.querySelector('form').addEventListener('submit', (event) => {
+    event.preventDefault();
 
-function nouvellePartie() {
+    nomJoueur = document.getElementById('nom_joueur').value;
+    nomAdversaire = document.getElementById('nom_adversaire').value;
+    const url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
+    token = document.getElementById('jeton_joueur_ia').value;
+    console.log(url_api_joueur_ia);
+    instanceAxios = axios.create({
+        baseURL: url_api_joueur_ia,
+        params: { 'api_key': token }
+    })
+    nouvellePartie(nom_joueur, nom_adversaire);
+});
+
+function nouvellePartie(nom_joueur, nom_adversaire) {
     console.log("frite");
 
     creationPartie().then(
