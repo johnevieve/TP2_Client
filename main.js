@@ -39,6 +39,7 @@ var indexBateau = 0;
 var directionPlacement = true;
 var estPlacable = false;
 
+// tester et corriger
 async function creationPartie() {
     try {
         return await axios.post(url_api_joueur_ia, { adversaire: nomAdversaire }, { headers: { "Authorization": `Bearer ${token}` } });
@@ -100,28 +101,34 @@ async function nouvellePartie() {
                     posBateauxAdversaire[i][j] = false;
                 }
             }
-            console.log(bateauxAdversaire);
-            console.log(posBateauxAdversaire);
+
+
             for (const [bateau, positions] of Object.entries(bateauxAdversaire)) {
                 for (const position of positions) {
                     const [x, y] = position.split('-');
                     posBateauxAdversaire[x.charCodeAt(0) - 'A'.charCodeAt(0)][y - 1] = true;
                 }
             }
+            
+            document.getElementById("formulaire").remove();
+            const idPartieEl = document.createElement('div');
+            idPartieEl.innerHTML = "Partie ID : " + idPartie;
+            document.body.appendChild(idPartieEl);
 
-            console.log(bateauxAdversaire);
-            console.log(posBateauxAdversaire);
-            document.getElementById("id_partie").innerHTML = "Partie ID : " + idPartie;
-            document.getElementById("nom_joueur").innerHTML = "Joueur : " + nomJoueur;
-            document.getElementById("nom_adversaire").innerHTML = "Adversaire : " + nomAdversaire;
+            const nomJoueurEl = document.createElement('div');
+            nomJoueurEl.innerHTML = "Joueur : " + nomJoueur;
+            document.body.appendChild(nomJoueurEl);
 
-            let bouton = document.getElementById("boutton_partie");
+            const nomAdversaireEl = document.createElement('div');
+            nomAdversaireEl.innerHTML = "Adversaire : " + nomAdversaire;
+            document.body.appendChild(nomAdversaireEl);
 
+            const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
-            bouton.onclick(terminerPartie);
+            bouton.onclick = terminerPartie;
+            document.body.appendChild(bouton);
 
-            initierTableaux("tableau_joueur");
-            initierTableaux("tableau_adversaire");
+            
         }
     );
 }
