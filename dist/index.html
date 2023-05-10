@@ -6,16 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Client</title>
     
-  <script type="module" crossorigin src="/assets/index-7fae51b3.js"></script>
+  <script type="module" crossorigin src="/assets/index-2d3a07b0.js"></script>
 </head>
 
 <body>
-    <button id="bouton_nouvellePartie">Nouvelle Partie</button>
     <button id="bouton_changerDirectionPlacementBateau">&#8635;</button>
-    <a id="error_message"></a>
-    <a id="id_partie"></a>
-    <a id="nom_joueur"></a>
-    <a id="nom_adversaire"></a>
+    <p id="error_message"></p>
+    
+    <form id="formulaire">
+        <label for="nom_joueur">Nom du joueur :</label>
+        <input type="text" id="nom_joueur" name="nom_joueur"><br><br>
+    
+        <label for="nom_adversaire">Nom de l'adversaire :</label>
+        <input type="text" id="nom_adversaire" name="nom_adversaire"><br><br>
+    
+        <label for="url_api_joueur_ia">URL de l'API du joueur IA :</label>
+        <input type="text" id="url_api_joueur_ia" name="url_api_joueur_ia"><br><br>
+    
+        <label for="jeton_joueur_ia">Jeton du joueur IA :</label>
+        <input type="text" id="jeton_joueur_ia" name="jeton_joueur_ia"><br><br>
+    
+        <input type="submit" value="Valider">
+    </form>
 
     <div id="tableau_joueur"></div>
     <div id="tableau_adversaire"></div>

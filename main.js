@@ -2,45 +2,7 @@ import './style.css';
 import axios from 'axios';
 
 let token;
-
-let instanceAxios;
-
-/*async function getTrendings() {
-    try {
-        return await instanceAxios.get('trending', { params: { limit: 10 }});
-    } catch (error) {
-        // ...
-        console.error(error);
-    }
-}*/
-
-/*async function getGifURL(id) {
-    try {
-        const response = await instanceAxios.get(id);
-        return response?.data?.data?.images?.fixed_height?.url;
-    } catch (error) {
-        // ...
-        console.error(error);
-    }
-}*/
-
-/*function refreshImage() {
-    getTrendings().then(response => {
-        let firstId = response?.data?.data[0]?.id;
-
-        if (firstId) {
-            getGifURL(firstId).then(response => {
-                if (response) {
-                    let image = document.createElement('img');
-                    image.src = response;
-                    document.body.appendChild(image);
-                }
-            })
-        }
-    })
-}*/
-
-//refreshImage();
+let url_api_joueur_ia;
 
 const bateaux = {
     porteAvions: 5,
@@ -76,8 +38,7 @@ var estPlacable = false;
 
 async function creationPartie() {
     try {
-        //return await instanceAxios.post(nomAdversaire);
-        return await axios.post('http://localhost/api/battleship-ia/parties', nomAdversaire, instanceAxios);
+        return await axios.post(url_api_joueur_ia, { adversaire: nomAdversaire }, { headers: { "Authorization": `Bearer ${token}` } });
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -85,7 +46,7 @@ async function creationPartie() {
 
 async function terminerPartie() {
     try {
-        return await instanceAxios.delete(idPartie);
+        return await axios.delete(url_api_joueur_ia + "/" + idPartie);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -93,7 +54,7 @@ async function terminerPartie() {
 
 async function recevoirMissile() {
     try {
-        const response = await instanceAxios.post(idPartie + "/missiles");
+        const response = await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles");
         let coordonnee = response?.data?.data?.coordonnee;
         envoieResultatMissile(coordonnee);
     } catch (error) {
@@ -104,7 +65,7 @@ async function recevoirMissile() {
 async function envoieResultatMissile(coordonnee) {
     try {
         let resultat = verifierPositionBateau(coordonnee);
-        const response = await instanceAxios.put(idPartie + "/missiles/" + coordonnee, resultat);
+        const response = await axios.put(url_api_joueur_ia + "/" + idPartie + "/missiles/" + coordonnee, resultat);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -115,21 +76,17 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
 
     nomJoueur = document.getElementById('nom_joueur').value;
     nomAdversaire = document.getElementById('nom_adversaire').value;
-    const url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
+    url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
     token = document.getElementById('jeton_joueur_ia').value;
-    console.log(url_api_joueur_ia);
-    instanceAxios = axios.create({
-        baseURL: url_api_joueur_ia,
-        params: { 'api_key': token }
-    })
-    nouvellePartie(nom_joueur, nom_adversaire);
+    nouvellePartie();
 });
 
-function nouvellePartie(nom_joueur, nom_adversaire) {
-    console.log("frite");
+function nouvellePartie() {
+
 
     creationPartie().then(
         response => {
+            console.log(response);
             idPartie = response?.data?.data?.id;
             posBateauxAdversaire = response?.data?.data?.bateaux;
 
@@ -146,7 +103,6 @@ function nouvellePartie(nom_joueur, nom_adversaire) {
             initierTableaux("tableau_adversaire");
         }
     );
-    console.log("patate");
 }
 
 function initierTableaux(divId) {
@@ -226,9 +182,3 @@ function afficherMessageErreur(error) {
     document.getElementById("error_message").innerHTML = error.message;
     console.error(error);
 }
-
-
-export const fonctions = {
-    nouvellePartie,
-    changerDirectionPlacementBateau
-};
