@@ -141,30 +141,28 @@ function initierTableaux(divId) {
     let div = document.getElementById(divId);
     const table = document.createElement("table");
 
-    // Créer une rangée pour les lettres
-    const rowLetters = document.createElement("tr");
-    rowLetters.appendChild(document.createElement("th"));
-    for (let i = 0; i < 7; i++) {
-        const letter = String.fromCharCode(i + 65);
+    const ligneLettre = document.createElement("tr");
+    ligneLettre.appendChild(document.createElement("th"));
+    for (let i = 0; i < taillePlateau; i++) {
+        const lettre = String.fromCharCode(i + 65);
         const th = document.createElement("th");
-        th.innerText = letter;
-        rowLetters.appendChild(th);
+        th.innerText = lettre;
+        ligneLettre.appendChild(th);
     }
-    table.appendChild(rowLetters);
+    table.appendChild(ligneLettre);
 
-    // Créer les autres rangées
-    for (let i = 1; i < 8; i++) {
-        const row = document.createElement("tr");
+    for (let i = 1; i < taillePlateau + 1; i++) {
+        const ligne = document.createElement("tr");
         const th = document.createElement("th");
         th.innerText = i;
-        row.appendChild(th);
+        ligne.appendChild(th);
 
-        for (let j = 0; j < 7; j++) {
-            const cell = document.createElement("td");
-            cell.setAttribute("id", `${String.fromCharCode(j + 65)}-${i}`);
-            row.appendChild(cell);
+        for (let j = 0; j < taillePlateau; j++) {
+            const colonne = document.createElement("td");
+            colonne.setAttribute("id", `${String.fromCharCode(j + 65)}-${i}`);
+            ligne.appendChild(colonne);
         }
-        table.appendChild(row);
+        table.appendChild(ligne);
     }
 
     div.appendChild(table);
