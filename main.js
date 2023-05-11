@@ -133,39 +133,49 @@ async function nouvellePartie() {
 
             initierTableaux("tableau_joueur");
             initierTableaux("tableau_adversaire");
+            placerBateau();
         }
     );
 }
 
+// marche
 function initierTableaux(divId) {
-    let div = document.getElementById(divId);
+    let div = document.createElement('div');
+    div.id = divId;
     const table = document.createElement("table");
 
     const ligneLettre = document.createElement("tr");
     ligneLettre.appendChild(document.createElement("th"));
-    for (let i = 0; i < taillePlateau; i++) {
-        const lettre = String.fromCharCode(i + 65);
-        const th = document.createElement("th");
-        th.innerText = lettre;
-        ligneLettre.appendChild(th);
-    }
-    table.appendChild(ligneLettre);
 
-    for (let i = 1; i < taillePlateau + 1; i++) {
-        const ligne = document.createElement("tr");
+    for (let i = 1; i <= taillePlateau; i++) {
         const th = document.createElement("th");
         th.innerText = i;
+        ligneLettre.appendChild(th);
+    }
+
+    table.appendChild(ligneLettre);
+
+    for (let i = 0; i < taillePlateau; i++) {
+        const ligne = document.createElement("tr");
+        const th = document.createElement("th");
+        th.innerText = String.fromCharCode(i + 65);
         ligne.appendChild(th);
 
-        for (let j = 0; j < taillePlateau; j++) {
+        for (let j = 1; j <= taillePlateau; j++) {
             const colonne = document.createElement("td");
-            colonne.setAttribute("id", `${String.fromCharCode(j + 65)}-${i}`);
+            colonne.classList.add("casePlateau");
+            colonne.setAttribute("id", `${String.fromCharCode(i + 65)}-${j}`);
             ligne.appendChild(colonne);
         }
         table.appendChild(ligne);
     }
 
     div.appendChild(table);
+    document.body.appendChild(table);
+}
+
+function placerBateau() {
+
 }
 
 function verifierPlacementBateau() {
