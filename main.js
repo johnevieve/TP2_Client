@@ -40,6 +40,7 @@ let missilesAdversaire = {}
 let indexBateau = 0;
 let directionPlacement = true;
 let bateauSelectionner = "";
+let cordonneeBateauMouse = [];
 
 // marche
 async function creationPartie() {
@@ -167,18 +168,30 @@ function initierTableaux(divId) {
 
         for (let j = 1; j <= taillePlateau; j++) {
             const colonne = document.createElement("td");
-            colonne.classList.add("casePlateau");
+            colonne.classList.add("caseNormal");
             colonne.setAttribute("id", `${String.fromCharCode(i + 65)}-${j}`);
 
             if (divId == "tableau_joueur") {
                 colonne.addEventListener("mouseover", () => {
                     if (bateauSelectionner) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
+
+                        if (coordonneesBateau.length === bateaux[bateauSelectionner] && verifierBateauEstPlacable(coordonneesBateau)) {
+                            colonne.addEventListener("click", () => {
+                                colonne.classList.remove('caseNormal');
+                                colonne.classList.add('caseBateau');
+                            });
+                        }
                     }
                 });
 
                 colonne.addEventListener("mouseout", () => {
-                    colonne.style.backgroundColor = 'blue';
+                    colonne.removeEventListener("click", placerBateau);
+                    cordonneeBateauMouse.forEach(coordonnee => {
+                        const caseElement = document.getElementById(coordonnee);
+                        caseElement.style.backgroundColor = '';
+                    });
+                    cordonneeBateauMouse = [];
                 });
             }
 
@@ -243,7 +256,6 @@ function placerBateaux() {
 
 function placerBateau(coordonnee) {
     const cord = coordonnee.split('-')
-    let coordonnees = [];
     let dansPlateau = true;
     if (directionPlacement) {
         for (let j = 0; j < bateaux[bateauSelectionner]; j++) {
@@ -254,7 +266,7 @@ function placerBateau(coordonnee) {
                 break;
             }
 
-            coordonnees.push(`${x}-${y}`);
+            cordonneeBateauMouse.push(`${x}-${y}`);
         }
     } else {
         for (let i = 0; i < bateaux[bateauSelectionner]; i++) {
@@ -266,14 +278,20 @@ function placerBateau(coordonnee) {
                 break;
             }
 
-            coordonnees.push(`${x}-${y}`);
+            cordonneeBateauMouse.push(`${x}-${y}`);
         }
     }
     
-    if (dansPlateau && verifierBateauEstPlacable(coordonnees)){
-        console.log(coordonnees, true);
+    if (dansPlateau && verifierBateauEstPlacable()){
+        cordonneeBateauMouse.forEach(coordonnee => {
+            const caseElement = document.getElementById(coordonnee);
+            caseElement.style.backgroundColor = 'grey';
+        });
     } else {
-        console.log(coordonnees, false);
+        cordonneeBateauMouse.forEach(coordonnee => {
+            const caseElement = document.getElementById(coordonnee);
+            caseElement.style.backgroundColor = 'red';
+        });
     }
     
 }
@@ -308,7 +326,7 @@ function verifierPositionBateau(coordonnee) {
     return true;
 }
 
-function verifierBateauEstPlacable(coordonneesBateau) {
+function verifierBateauEstPlacable() {
     coordonneesBateau.forEach(coordonnee => {
         const cord = coordonnee.split('-')
         const ligne = parseInt(cord[1], 10) - 1;

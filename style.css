@@ -44,6 +44,10 @@ tr:first-child th {
   box-sizing: border-box;
 }
 
-.casePlateau {
+.caseNormal {
   background-color: blue;
+}
+
+.caseBateau {
+  background-color: gray;
 }
