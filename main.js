@@ -228,10 +228,19 @@ function placerPaletteBateaux() {
 function placerBateau() {
     const paletteBateaux = document.createElement('div');
     paletteBateaux.setAttribute("id", "paletteBateaux");
+
+    const bouton = document.createElement('button');
+
+    bouton.classList.add('bouton-direction');
+    bouton.innerHTML = "&#x21b7;";
+    bouton.addEventListener('click', changerDirectionPlacementBateau);
+
+    document.body.appendChild(bouton);
+
+
     document.body.appendChild(paletteBateaux);
 
     placerPaletteBateaux();
-
 }
 
 
