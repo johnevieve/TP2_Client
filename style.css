@@ -43,3 +43,7 @@ tr:first-child th {
   background-color: gray;
   box-sizing: border-box;
 }
+
+.casePlateau {
+  background-color: blue;
+}

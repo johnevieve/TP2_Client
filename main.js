@@ -4,7 +4,7 @@ import axios from 'axios';
 let token;
 let url_api_joueur_ia;
 
-const bateaux = {
+let bateaux = {
     porteAvions: 5,
     cuirasse: 4,
     destroyer: 3,
@@ -23,6 +23,7 @@ const resultat = {
 }
 
 const taillePlateau = 10;
+
 var idPartie;
 var nomJoueur = "Joueur 1"
 var nomAdversaire = "IA";
@@ -39,6 +40,7 @@ var missilesAdversaire = {}
 var indexBateau = 0;
 var directionPlacement = true;
 var estPlacable = false;
+var bateauSelectionner = "";
 
 // marche
 async function creationPartie() {
@@ -129,7 +131,7 @@ async function nouvellePartie() {
             initierTableaux("tableau_joueur");
             initierTableaux("tableau_adversaire");
             placerBateau();
-            
+
             const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
             bouton.onclick = terminerPartie;
@@ -161,10 +163,25 @@ function initierTableaux(divId) {
         th.innerText = String.fromCharCode(i + 65);
         ligne.appendChild(th);
 
+
         for (let j = 1; j <= taillePlateau; j++) {
             const colonne = document.createElement("td");
             colonne.classList.add("casePlateau");
             colonne.setAttribute("id", `${String.fromCharCode(i + 65)}-${j}`);
+
+            if (divId == "tableau_joueur") {
+                colonne.addEventListener("mouseover", () => {
+                    if (bateauSelectionner) {
+                        console.log(bateauSelectionner);
+                        colonne.style.backgroundColor = 'gray';
+                    }
+                });
+
+                colonne.addEventListener("mouseout", () => {
+                    colonne.style.backgroundColor = '';
+                });
+            }
+
             ligne.appendChild(colonne);
         }
         table.appendChild(ligne);
@@ -174,9 +191,9 @@ function initierTableaux(divId) {
     document.body.appendChild(table);
 }
 
-function placerBateau() {
-    const paletteBateaux = document.createElement('div');
-    paletteBateaux.setAttribute("id", "paletteBateaux");
+function placerPaletteBateaux() {
+    const paletteBateaux = document.getElementById("paletteBateaux");
+    paletteBateaux.innerText = "";
 
     for (const [nom, taille] of Object.entries(bateaux)) {
         const bateau = document.createElement('div');
@@ -198,10 +215,26 @@ function placerBateau() {
             bateau.style.width = `30px`;
             bateau.style.height = `${taille * 30}px`;
         }
+
+        bateau.addEventListener('click', () => {
+            console.log('bateau cliqué:', nom);
+            bateauSelectionner = nom;
+        });
+
         paletteBateaux.appendChild(bateau);
     }
-    document.body.appendChild(paletteBateaux);
 }
+
+function placerBateau() {
+    const paletteBateaux = document.createElement('div');
+    paletteBateaux.setAttribute("id", "paletteBateaux");
+    document.body.appendChild(paletteBateaux);
+
+    placerPaletteBateaux();
+
+}
+
+
 
 function verifierPlacementBateau() {
     if (indexBateau > 4) {
@@ -243,8 +276,10 @@ function verifierBateauEstPlacable(coordonneesBateau) {
     return true;
 }
 
+// marche 
 function changerDirectionPlacementBateau() {
     directionPlacement = !directionPlacement;
+    placerPaletteBateaux();
 }
 
 function afficherMessageErreur(error) {
