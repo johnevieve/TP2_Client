@@ -126,14 +126,14 @@ async function nouvellePartie() {
             nomAdversaireEl.innerHTML = "Adversaire : " + nomAdversaire;
             nomJoueurEl.insertAdjacentElement('afterend', nomAdversaireEl);
 
+            initierTableaux("tableau_joueur");
+            initierTableaux("tableau_adversaire");
+            placerBateau();
+            
             const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
             bouton.onclick = terminerPartie;
             document.body.appendChild(bouton);
-
-            initierTableaux("tableau_joueur");
-            initierTableaux("tableau_adversaire");
-            placerBateau();
         }
     );
 }
@@ -175,7 +175,32 @@ function initierTableaux(divId) {
 }
 
 function placerBateau() {
+    const paletteBateaux = document.createElement('div');
+    paletteBateaux.setAttribute("id", "paletteBateaux");
 
+    for (const [nom, taille] of Object.entries(bateaux)) {
+        const bateau = document.createElement('div');
+        bateau.setAttribute("id", nom);
+        bateau.classList.add("choixBateau");
+        for (let i = 1; i <= taille; i++) {
+            const carre = document.createElement('div');
+            carre.classList.add("carre");
+            bateau.appendChild(carre)
+        }
+        if (directionPlacement) {
+            bateau.style.display = "grid";
+            bateau.style.gridTemplateColumns = `repeat(${taille}, 1fr)`;
+            bateau.style.width = `${taille * 30}px`;
+            bateau.style.height = `30px`;
+        } else {
+            bateau.style.display = "inline-grid";
+            bateau.style.gridTemplateRows = `repeat(${taille}, 1fr)`;
+            bateau.style.width = `30px`;
+            bateau.style.height = `${taille * 30}px`;
+        }
+        paletteBateaux.appendChild(bateau);
+    }
+    document.body.appendChild(paletteBateaux);
 }
 
 function verifierPlacementBateau() {
