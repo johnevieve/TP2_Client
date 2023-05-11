@@ -24,23 +24,22 @@ const resultat = {
 
 const taillePlateau = 10;
 
-var idPartie;
-var nomJoueur = "Joueur 1"
-var nomAdversaire = "IA";
+let idPartie;
+let nomJoueur = "Joueur 1"
+let nomAdversaire = "IA";
 
-var bateauxJoueur = {}
-var bateauxAdversaire = {};
+let bateauxJoueur = {}
+let bateauxAdversaire = {};
 
-var posBateauxJoueur = []
-var posBateauxAdversaire = [];
+let posBateauxJoueur = []
+let posBateauxAdversaire = [];
 
-var missilesJoueur = {}
-var missilesAdversaire = {}
+let missilesJoueur = {}
+let missilesAdversaire = {}
 
-var indexBateau = 0;
-var directionPlacement = true;
-var estPlacable = false;
-var bateauSelectionner = "";
+let indexBateau = 0;
+let directionPlacement = true;
+let bateauSelectionner = "";
 
 // marche
 async function creationPartie() {
@@ -101,11 +100,13 @@ async function nouvellePartie() {
 
             for (let i = 0; i < 10; i++) {
                 posBateauxAdversaire[i] = [];
+                posBateauxJoueur[i] = [];
+
                 for (let j = 0; j < 10; j++) {
                     posBateauxAdversaire[i][j] = false;
+                    posBateauxJoueur[i][j] = false;
                 }
             }
-
 
             for (const [bateau, positions] of Object.entries(bateauxAdversaire)) {
                 for (const position of positions) {
@@ -130,7 +131,7 @@ async function nouvellePartie() {
 
             initierTableaux("tableau_joueur");
             initierTableaux("tableau_adversaire");
-            placerBateau();
+            placerBateaux();
 
             const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
@@ -172,13 +173,12 @@ function initierTableaux(divId) {
             if (divId == "tableau_joueur") {
                 colonne.addEventListener("mouseover", () => {
                     if (bateauSelectionner) {
-                        console.log(bateauSelectionner);
-                        colonne.style.backgroundColor = 'gray';
+                        placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
                     }
                 });
 
                 colonne.addEventListener("mouseout", () => {
-                    colonne.style.backgroundColor = '';
+                    colonne.style.backgroundColor = 'blue';
                 });
             }
 
@@ -191,6 +191,7 @@ function initierTableaux(divId) {
     document.body.appendChild(table);
 }
 
+// marche
 function placerPaletteBateaux() {
     const paletteBateaux = document.getElementById("paletteBateaux");
     paletteBateaux.innerText = "";
@@ -217,7 +218,6 @@ function placerPaletteBateaux() {
         }
 
         bateau.addEventListener('click', () => {
-            console.log('bateau cliqué:', nom);
             bateauSelectionner = nom;
         });
 
@@ -225,7 +225,7 @@ function placerPaletteBateaux() {
     }
 }
 
-function placerBateau() {
+function placerBateaux() {
     const paletteBateaux = document.createElement('div');
     paletteBateaux.setAttribute("id", "paletteBateaux");
 
@@ -236,13 +236,47 @@ function placerBateau() {
     bouton.addEventListener('click', changerDirectionPlacementBateau);
 
     document.body.appendChild(bouton);
-
-
     document.body.appendChild(paletteBateaux);
 
     placerPaletteBateaux();
 }
 
+function placerBateau(coordonnee) {
+    const cord = coordonnee.split('-')
+    let coordonnees = [];
+    let dansPlateau = true;
+    if (directionPlacement) {
+        for (let j = 0; j < bateaux[bateauSelectionner]; j++) {
+            const x = cord[0];
+            const y = parseInt(cord[1], 10) + j;
+            if (y > taillePlateau) {
+                dansPlateau = false;
+                break;
+            }
+
+            coordonnees.push(`${x}-${y}`);
+        }
+    } else {
+        for (let i = 0; i < bateaux[bateauSelectionner]; i++) {
+            const x = String.fromCharCode(cord[0].charCodeAt(0) + i);
+            const y = parseInt(cord[1], 10);
+
+            if (x > String.fromCharCode(64 + taillePlateau)) {
+                dansPlateau = false;
+                break;
+            }
+
+            coordonnees.push(`${x}-${y}`);
+        }
+    }
+    
+    if (dansPlateau && verifierBateauEstPlacable(coordonnees)){
+        console.log(coordonnees, true);
+    } else {
+        console.log(coordonnees, false);
+    }
+    
+}
 
 
 function verifierPlacementBateau() {
@@ -266,18 +300,21 @@ function lancerMissile(coordonnee) {
 }
 
 function verifierPositionBateau(coordonnee) {
-    cord = coordonnee.split('-')
-    if (isset(posBateauxJoueur[cord[0]][cord[1]])) {
-        return true;
+    const cord = coordonnee.split('-')
+    if (posBateauxJoueur[cord[0]][cord[1]]) {
+        return false;
     }
 
-    return false
+    return true;
 }
 
 function verifierBateauEstPlacable(coordonneesBateau) {
     coordonneesBateau.forEach(coordonnee => {
-        cord = coordonnee.split('-')
-        if (isset(posBateauxJoueur[cord[0]][cord[1]])) {
+        const cord = coordonnee.split('-')
+        const ligne = parseInt(cord[1], 10) - 1;
+        const colonne = cord[0].charCodeAt(0) - 65;
+
+        if (posBateauxJoueur[colonne][ligne]) {
             return false;
         }
     });
@@ -285,12 +322,15 @@ function verifierBateauEstPlacable(coordonneesBateau) {
     return true;
 }
 
+
+
 // marche 
 function changerDirectionPlacementBateau() {
     directionPlacement = !directionPlacement;
     placerPaletteBateaux();
 }
 
+// marche 
 function afficherMessageErreur(error) {
     document.getElementById("error_message").innerHTML = error.message;
     console.error(error);
