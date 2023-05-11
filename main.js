@@ -189,9 +189,16 @@ function initierTableaux(divId) {
                                     const caseElement = document.getElementById(coordonnee);
                                     caseElement.classList.remove('caseNormal');
                                     caseElement.classList.add('caseBateau');
-
-                                    console.log(bateauxJoueur);
                                 });
+                                delete bateaux[bateauSelectionner];
+                                
+                                if (Object.values(bateaux).some(val => val !== 0)) {
+                                    placerPaletteBateaux();
+                                } else {
+                                    document.getElementById("placerBateaux").remove();
+                                    jouerPartie();
+                                }
+                                
                             });
                         }
                     }
@@ -250,7 +257,15 @@ function placerPaletteBateaux() {
     }
 }
 
+function jouerPartie() {
+
+}
+
+//marche
 function placerBateaux() {
+    const placerBateaux = document.createElement('div');
+    placerBateaux.setAttribute("id", "placerBateaux");
+
     const paletteBateaux = document.createElement('div');
     paletteBateaux.setAttribute("id", "paletteBateaux");
 
@@ -260,12 +275,14 @@ function placerBateaux() {
     bouton.innerHTML = "&#x21b7;";
     bouton.addEventListener('click', changerDirectionPlacementBateau);
 
-    document.body.appendChild(bouton);
-    document.body.appendChild(paletteBateaux);
+    placerBateaux.appendChild(bouton);
+    placerBateaux.appendChild(paletteBateaux);
+    document.body.appendChild(placerBateaux);
 
     placerPaletteBateaux();
 }
 
+//marche
 function placerBateau(coordonnee) {
     const cord = coordonnee.split('-')
     let dansPlateau = true;
@@ -340,18 +357,19 @@ function verifierPositionBateau(coordonnee) {
 
 // marche
 function verifierBateauEstPlacable() {
-    cordonneeBateauMouse.forEach(coordonnee => {
-        const cord = coordonnee.split('-')
+    for (const coordonnee of cordonneeBateauMouse) {
+        const cord = coordonnee.split('-');
         const ligne = parseInt(cord[1], 10) - 1;
         const colonne = cord[0].charCodeAt(0) - 65;
 
         if (posBateauxJoueur[colonne][ligne]) {
             return false;
         }
-    });
+    }
 
     return true;
 }
+
 
 
 
