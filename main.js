@@ -28,16 +28,12 @@ let idPartie;
 let nomJoueur = "Joueur 1"
 let nomAdversaire = "IA";
 
-let bateauxJoueur = [];
-let bateauxAdversaire = [];
-
 let posBateauxJoueur = []
 let posBateauxAdversaire = [];
 
 let missilesJoueur = {};
 let missilesAdversaire = {}
 
-let indexBateau = 0;
 let directionPlacement = true;
 let bateauSelectionner = "";
 let cordonneeBateauMouse = [];
@@ -97,7 +93,7 @@ async function nouvellePartie() {
         response => {
             idPartie = response?.data?.data?.id;
 
-            bateauxAdversaire = response?.data?.data?.bateaux;
+            let bateauxAdversaire = response?.data?.data?.bateaux;
 
             for (let i = 0; i < 10; i++) {
                 posBateauxAdversaire[i] = [];
@@ -179,7 +175,6 @@ function initierTableaux(divId) {
                         if (cordonneeBateauMouse.length === bateaux[bateauSelectionner] && verifierBateauEstPlacable()) {
                             colonne.addEventListener("click", () => {
                                 cordonneeBateauMouse.forEach(coordonnee => {
-                                    bateauxJoueur.push(coordonnee);
 
                                     const cord = coordonnee.split('-')
                                     const ligne = parseInt(cord[1], 10) - 1;
@@ -258,7 +253,7 @@ function placerPaletteBateaux() {
 }
 
 function jouerPartie() {
-
+    console.log("sart");
 }
 
 //marche
@@ -323,23 +318,6 @@ function placerBateau(coordonnee) {
         });
     }
 
-}
-
-
-function verifierPlacementBateau() {
-    if (indexBateau > 4) {
-        let tableauJoueur = document.getElementById("tableau_joueur").querySelectorAll("[target]");
-        let tableauAdversaire = document.getElementById("tableau_adversaire").querySelectorAll("[target]");
-
-        tableauJoueur.forEach((element) => {
-            element.removeEventListener("mouseover", verifierPlacementBateau);
-            element.removeEventListener("click", verifierBateauEstPlacable);
-        })
-
-        tableauAdversaire.forEach((element) => {
-            element.addEventListener("click", lancerMissile(element.id));
-        })
-    }
 }
 
 function lancerMissile(coordonnee) {
