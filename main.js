@@ -192,9 +192,10 @@ function initierTableaux(divId) {
                                 if (Object.values(bateaux).some(val => val !== 0)) {
                                     placerPaletteBateaux();
                                 } else {
-                                    const pallete = document.getElementById("paletteBateaux")
-                                    if(pallete)
-                                    pallete.remove();
+                                    const pallete = document.getElementById("divPlacerBateaux");
+                                    if(pallete) {
+                                        pallete.remove();
+                                    }
     
                                     jouerPartie();
                                 }
@@ -258,13 +259,18 @@ function placerPaletteBateaux() {
 }
 
 function jouerPartie() {
-    console.log("sart");
+    let partieEnCour = true; 
+    let tourJoueur = Math.random() < 0.5;
+    console.log(tourJoueur);
+    do {
+        partieEnCour = false;
+    } while (partieEnCour)
 }
 
 //marche
 function placerBateaux() {
     const placerBateaux = document.createElement('div');
-    placerBateaux.setAttribute("id", "placerBateaux");
+    placerBateaux.setAttribute("id", "divPlacerBateaux");
 
     const paletteBateaux = document.createElement('div');
     paletteBateaux.setAttribute("id", "paletteBateaux");
@@ -352,8 +358,6 @@ function verifierBateauEstPlacable() {
 
     return true;
 }
-
-
 
 
 // marche 
