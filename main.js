@@ -79,16 +79,17 @@ async function envoieResultatMissile(coordonnee) {
 
 var button = document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
-
-    nomJoueur = document.getElementById('nom_joueur').value;
-    nomAdversaire = document.getElementById('nom_adversaire').value;
-    url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
-    token = document.getElementById('jeton_joueur_ia').value;
     nouvellePartie();
 });
 
 // marche
 async function nouvellePartie() {
+
+    nomJoueur = document.getElementById('nom_joueur').value;
+    nomAdversaire = document.getElementById('nom_adversaire').value;
+    url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
+    token = document.getElementById('jeton_joueur_ia').value;
+
     creationPartie().then(
         response => {
             idPartie = response?.data?.data?.id;
@@ -168,8 +169,9 @@ function initierTableaux(divId) {
             colonne.setAttribute("id", `${String.fromCharCode(i + 65)}-${j}`);
 
             if (divId == "tableau_joueur") {
+                
                 colonne.addEventListener("mouseover", () => {
-                    if (bateauSelectionner) {
+                    if (bateauSelectionner != null) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
 
                         if (cordonneeBateauMouse.length === bateaux[bateauSelectionner] && verifierBateauEstPlacable()) {
@@ -190,14 +192,17 @@ function initierTableaux(divId) {
                                 if (Object.values(bateaux).some(val => val !== 0)) {
                                     placerPaletteBateaux();
                                 } else {
-                                    document.getElementById("placerBateaux").remove();
+                                    const pallete = document.getElementById("paletteBateaux")
+                                    if(pallete)
+                                    pallete.remove();
+    
                                     jouerPartie();
                                 }
                                 
                             });
                         }
                     }
-                });
+                }) ;
 
                 colonne.addEventListener("mouseout", () => {
                     colonne.removeEventListener("click", placerBateau);
@@ -207,7 +212,7 @@ function initierTableaux(divId) {
                     });
                     cordonneeBateauMouse = [];
                 });
-            }
+            } 
 
             ligne.appendChild(colonne);
         }
