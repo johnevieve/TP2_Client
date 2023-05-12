@@ -25,14 +25,14 @@ const resultat = {
 const taillePlateau = 10;
 
 let idPartie;
-let nomJoueur = "Joueur 1"
-let nomAdversaire = "IA";
+let nomJoueur;
+let nomAdversaire;
 
 let posBateauxJoueur = []
 let posBateauxAdversaire = [];
 
-let missilesJoueur = {};
-let missilesAdversaire = {}
+let missilesJoueur = [];
+let missilesAdversaire = []
 
 let directionPlacement = true;
 let bateauSelectionner = "";
@@ -57,9 +57,7 @@ async function terminerPartie() {
 
 async function recevoirMissile() {
     try {
-        const response = await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles", { headers: { "Authorization": `Bearer ${token}` } });
-        let coordonnee = response?.data?.data?.coordonnee;
-        envoieResultatMissile(coordonnee);
+        return await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles", {}, { headers: { "Authorization": `Bearer ${token}` } });
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -96,13 +94,16 @@ async function nouvellePartie() {
 
             let bateauxAdversaire = response?.data?.data?.bateaux;
 
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < taillePlateau; i++) {
                 posBateauxAdversaire[i] = [];
                 posBateauxJoueur[i] = [];
-
-                for (let j = 0; j < 10; j++) {
+                missilesJoueur[i] = [];
+                missilesAdversaire[i] = [];
+                for (let j = 0; j < taillePlateau; j++) {
                     posBateauxAdversaire[i][j] = false;
-                    posBateauxJoueur[i][j] = false;
+                    posBateauxJoueur[i][j] = false; 
+                    missilesJoueur[i][j] = false;
+                    missilesAdversaire[i][j] = false;
                 }
             }
 
@@ -142,9 +143,8 @@ async function nouvellePartie() {
 // marche
 function initierTableaux(divId) {
     let div = document.createElement('div');
-    div.id = divId;
     const table = document.createElement("table");
-
+    table.setAttribute("id", divId);
     const ligneLettre = document.createElement("tr");
     ligneLettre.appendChild(document.createElement("th"));
 
@@ -169,7 +169,6 @@ function initierTableaux(divId) {
             colonne.setAttribute("id", `${String.fromCharCode(i + 65)}-${j}`);
 
             if (divId == "tableau_joueur") {
-                
                 colonne.addEventListener("mouseover", () => {
                     if (bateauSelectionner != null) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
@@ -261,9 +260,25 @@ function placerPaletteBateaux() {
 function jouerPartie() {
     let partieEnCour = true; 
     let tourJoueur = Math.random() < 0.5;
-    console.log(tourJoueur);
+
+
+
     do {
+
+        if(tourJoueur) {
+            for (let i = 0; i < taillePlateau; i++) {
+                for (let j = 0; j < taillePlateau; j++) {
+                    if (!missilesJoueur[i][j]) {
+                        let element = document.getElementById('tableau_adversaire').querySelector('#' + String.fromCharCode(65 + i) + '-' + (j + 1));
+                        element.addEventListener('click', lancerMissile);
+                    }
+                }
+            }
+        } else {
+            recevoirMissile().then(response => { console.log(response?.data?.data);})
+        }
         partieEnCour = false;
+
     } while (partieEnCour)
 }
 
@@ -331,8 +346,8 @@ function placerBateau(coordonnee) {
 
 }
 
-function lancerMissile(coordonnee) {
-
+function lancerMissile() {
+    console.log("BBBOOOOOMMMM")
 }
 
 function verifierPositionBateau(coordonnee) {
