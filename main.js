@@ -196,7 +196,7 @@ function initierTableaux(divId) {
 
             } else {
                 colonne.addEventListener("click", () => {
-                    clickCaseAdversaire(i, j);
+                    clickCaseAdversaire(i, j-1);
                 });
 
             }
@@ -370,11 +370,11 @@ function jouerPartie() {
 }
 
 function lancerMissile(colonne, ligne) {
-    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne}`);
+    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne+1}`);
     if (tourJoueur) {
-        missilesJoueur[colonne][ligne-1] = true;
+        missilesJoueur[colonne][ligne] = true;
 
-        if (posBateauxAdversaire[colonne][ligne-1]) {
+        if (posBateauxAdversaire[colonne][ligne]) {
             console.log("Joueur : BOOM");
         }
 
