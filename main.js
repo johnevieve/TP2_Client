@@ -85,7 +85,7 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
 
 // marche
 async function nouvellePartie() {
-    
+
     nomJoueur = document.getElementById('nom_joueur').value;
     nomAdversaire = document.getElementById('nom_adversaire').value;
     url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
@@ -182,7 +182,6 @@ function initierTableaux(divId) {
                     if (bateauSelectionner != null) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
 
-
                         colonne.addEventListener("click", () => {
                             if (cordonneeBateauMouse.length === bateaux[bateauSelectionner] && verifierBateauEstPlacable()) {
                                 cordonneeBateauMouse.forEach(coordonnee => {
@@ -196,6 +195,7 @@ function initierTableaux(divId) {
                                     caseElement.classList.remove('caseNormal');
                                     caseElement.classList.add('caseBateau');
                                 });
+
                                 delete bateaux[bateauSelectionner];
 
                                 if (Object.values(bateaux).some(val => val !== 0)) {
@@ -206,8 +206,6 @@ function initierTableaux(divId) {
                                         pallete.remove();
                                         jouerPartie();
                                     }
-
-
                                 }
                             }
                         });
@@ -216,13 +214,14 @@ function initierTableaux(divId) {
                 });
 
                 colonne.addEventListener("mouseout", () => {
-        
                     cordonneeBateauMouse.forEach(coordonnee => {
                         const caseElement = document.getElementById(coordonnee);
                         caseElement.style.backgroundColor = '';
                     });
                     cordonneeBateauMouse = [];
                 });
+            } else {
+                colonne.addEventListener("click", lancerMissile);
             }
 
             ligne.appendChild(colonne);
@@ -336,18 +335,21 @@ function jouerPartie() {
     if (!partieEnCour) {
         tourJoueur = Math.random() < 0.5;
         partieEnCour = true;
-
-
     }
-
-
+    console.log("start", tourJoueur);
+    if (!tourJoueur) {
+        recevoirMissile().then(response => console.log(response.data?.data.coordonnee));
+        tourJoueur = true;
+    }
 
 }
 
 function lancerMissile() {
-    console.log("BOOM");
-    tourJoueur = false;
-
+    if (tourJoueur) {
+        console.log("BOOM");
+        tourJoueur = false;
+        jouerPartie();
+    }
 }
 
 function verifierPositionBateau(coordonnee) {
