@@ -69,7 +69,8 @@ async function recevoirMissile() {
 
 async function envoieResultatMissile(coordonnee, resultat) {
     try {
-        const response = await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, {'resultat' : resultat});
+        const response = await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, resultat);
+        
         return response;
     } catch (error) {
         afficherMessageErreur(error);
@@ -378,9 +379,7 @@ function tourAdversaire() {
                 caseJoueur.classList.add('caseToucher');
             } else {
                 caseJoueur.classList.add('caseManquer');
-                envoieResultatMissile(response.data?.data.coordonnee, 0).then( response => {
-                    console.log(response);
-                })
+                envoieResultatMissile(response.data?.data.coordonnee, { 'resultat': 0 }).then();
             }
         });
         tourJoueur = true;
