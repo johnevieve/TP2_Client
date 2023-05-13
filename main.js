@@ -196,7 +196,7 @@ function initierTableaux(divId) {
 
             } else {
                 colonne.addEventListener("click", () => {
-                    clickCaseAdversaire(i, j-1);
+                    clickCaseAdversaire(i, j - 1);
                 });
 
             }
@@ -360,8 +360,15 @@ function jouerPartie() {
             const ligne = parseInt(cord[1]) - 1;
             missilesAdversaire[colonne][ligne] = true;
 
+            const caseJoueur = document.querySelector('#tableau_joueur td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
+
+            caseJoueur.classList.remove('caseNormal');
+
+
             if (posBateauxJoueur[colonne][ligne]) {
-                console.log("Adversaire : BOOM");
+                caseJoueur.classList.add('caseToucher');
+            } else {
+                caseJoueur.classList.add('caseManquer');
             }
         });
         tourJoueur = true;
@@ -370,12 +377,19 @@ function jouerPartie() {
 }
 
 function lancerMissile(colonne, ligne) {
-    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne+1}`);
+    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne + 1}`);
     if (tourJoueur) {
         missilesJoueur[colonne][ligne] = true;
 
+        const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
+
+        caseJoueur.classList.remove('caseNormal');
+
         if (posBateauxAdversaire[colonne][ligne]) {
             console.log("Joueur : BOOM");
+            caseJoueur.classList.add('caseToucher');
+        } else {
+            caseJoueur.classList.add('caseManquer');
         }
 
         tourJoueur = false;
