@@ -69,10 +69,10 @@ async function recevoirMissile() {
     }
 }
 
-async function envoieResultatMissile(coordonnee) {
+async function envoieResultatMissile(coordonnee, resultat) {
     try {
-        let resultat = verifierPositionBateau(coordonnee);
-        return await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, resultat);
+        const response = await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, {'resultat' : resultat});
+        return response;
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -234,15 +234,33 @@ function clickCaseJoueur() {
 
             if (pallete) {
                 pallete.remove();
-                jouerPartie();
+                tourJoueur = Math.random() < 0.5;
+                partieEnCour = true;
+                if(!tourJoueur) {
+                    tourAdversaire();
+                }
             }
         }
     }
 }
 
-function clickCaseAdversaire(x, y) {
-    if (partieEnCour && tourJoueur && !missilesJoueur[x][y]) {
-        lancerMissile(x, y)
+function clickCaseAdversaire(colonne, ligne) {
+    if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
+        missilesJoueur[colonne][ligne] = true;
+
+        const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
+
+        caseJoueur.classList.remove('caseNormal');
+
+        if (posBateauxAdversaire[colonne][ligne]) {
+            caseJoueur.classList.add('caseToucher');
+        } else {
+            caseJoueur.classList.add('caseManquer');
+        }
+
+        tourJoueur = false;
+        tourAdversaire();
+        
     }
 }
 
@@ -344,17 +362,9 @@ function placerBateau(coordonnee) {
 
 }
 
-function jouerPartie() {
-    if (!partieEnCour) {
-        tourJoueur = Math.random() < 0.5;
-        partieEnCour = true;
-        console.log("Advaisaire : ", posBateauxAdversaire);
-        console.log("Joueur : ", posBateauxJoueur);
-    }
-
+function tourAdversaire() {
     if (!tourJoueur) {
         recevoirMissile().then(response => {
-            console.log("Adversaire : ffiiooouuu", response.data?.data.coordonnee)
             const cord = response.data?.data.coordonnee.split('-');
             const colonne = cord[0].charCodeAt(0) - 65;
             const ligne = parseInt(cord[1]) - 1;
@@ -369,33 +379,15 @@ function jouerPartie() {
                 caseJoueur.classList.add('caseToucher');
             } else {
                 caseJoueur.classList.add('caseManquer');
+                envoieResultatMissile(response.data?.data.coordonnee, 0).then( response => {
+                    console.log(response);
+                })
             }
         });
         tourJoueur = true;
     }
-
 }
 
-function lancerMissile(colonne, ligne) {
-    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne + 1}`);
-    if (tourJoueur) {
-        missilesJoueur[colonne][ligne] = true;
-
-        const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
-
-        caseJoueur.classList.remove('caseNormal');
-
-        if (posBateauxAdversaire[colonne][ligne]) {
-            console.log("Joueur : BOOM");
-            caseJoueur.classList.add('caseToucher');
-        } else {
-            caseJoueur.classList.add('caseManquer');
-        }
-
-        tourJoueur = false;
-        jouerPartie();
-    }
-}
 
 // marche
 function verifierBateauEstPlacable() {
