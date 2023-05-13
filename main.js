@@ -181,7 +181,6 @@ function initierTableaux(divId) {
                 colonne.addEventListener("mouseover", () => {
                     if (entiterSelectionner != null) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
-                        
                     }
                 });
 
@@ -242,8 +241,8 @@ function clickCaseJoueur() {
 }
 
 function clickCaseAdversaire(x, y) {
-    if(partieEnCour && tourJoueur && !missilesJoueur[x][y]) {
-        console.log("click");
+    if (partieEnCour && tourJoueur && !missilesJoueur[x][y]) {
+        lancerMissile(x, y)
     }
 }
 
@@ -349,30 +348,39 @@ function jouerPartie() {
     if (!partieEnCour) {
         tourJoueur = Math.random() < 0.5;
         partieEnCour = true;
+        console.log("Advaisaire : ", posBateauxAdversaire);
+        console.log("Joueur : ", posBateauxJoueur);
     }
-    
+
     if (!tourJoueur) {
-        recevoirMissile().then(response => console.log(response.data?.data.coordonnee));
+        recevoirMissile().then(response => {
+            console.log("Adversaire : ffiiooouuu", response.data?.data.coordonnee)
+            const cord = response.data?.data.coordonnee.split('-');
+            const colonne = cord[0].charCodeAt(0) - 65;
+            const ligne = parseInt(cord[1]) - 1;
+            missilesAdversaire[colonne][ligne] = true;
+
+            if (posBateauxJoueur[colonne][ligne]) {
+                console.log("Adversaire : BOOM");
+            }
+        });
         tourJoueur = true;
     }
 
 }
 
-function lancerMissile(coordonnee) {
-    console.log("BOOM", coordonnee);
+function lancerMissile(colonne, ligne) {
+    console.log("Joueur : ffiiooouuu", `${String.fromCharCode(colonne + 65)}-${ligne}`);
     if (tourJoueur) {
+        missilesJoueur[colonne][ligne-1] = true;
+
+        if (posBateauxAdversaire[colonne][ligne-1]) {
+            console.log("Joueur : BOOM");
+        }
+
         tourJoueur = false;
         jouerPartie();
     }
-}
-
-function verifierPositionBateau(coordonnee) {
-    const cord = coordonnee.split('-')
-    if (posBateauxJoueur[cord[0]][cord[1]]) {
-        return false;
-    }
-
-    return true;
 }
 
 // marche
