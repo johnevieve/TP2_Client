@@ -40,7 +40,7 @@ let missilesJoueur = [];
 let missilesAdversaire = []
 
 let directionPlacement = true;
-let bateauSelectionner = "";
+let entiterSelectionner = "";
 let cordonneeBateauMouse = [];
 let partieEnCour = false;
 
@@ -179,37 +179,9 @@ function initierTableaux(divId) {
 
             if (divId == "tableau_joueur") {
                 colonne.addEventListener("mouseover", () => {
-                    if (bateauSelectionner != null) {
+                    if (entiterSelectionner != null) {
                         placerBateau(`${String.fromCharCode(i + 65)}-${j}`);
-
-                        colonne.addEventListener("click", () => {
-                            if (cordonneeBateauMouse.length === bateaux[bateauSelectionner] && verifierBateauEstPlacable()) {
-                                cordonneeBateauMouse.forEach(coordonnee => {
-
-                                    const cord = coordonnee.split('-')
-                                    const ligne = parseInt(cord[1], 10) - 1;
-                                    const colonne = cord[0].charCodeAt(0) - 65;
-                                    posBateauxJoueur[colonne][ligne] = true;
-
-                                    const caseElement = document.getElementById(coordonnee);
-                                    caseElement.classList.remove('caseNormal');
-                                    caseElement.classList.add('caseBateau');
-                                });
-
-                                delete bateaux[bateauSelectionner];
-
-                                if (Object.values(bateaux).some(val => val !== 0)) {
-                                    placerPaletteBateaux();
-                                } else {
-                                    const pallete = document.getElementById("divPlacerBateaux");
-                                    if (pallete) {
-                                        pallete.remove();
-                                        jouerPartie();
-                                    }
-                                }
-                            }
-                        });
-
+                        
                     }
                 });
 
@@ -220,8 +192,14 @@ function initierTableaux(divId) {
                     });
                     cordonneeBateauMouse = [];
                 });
+
+                colonne.addEventListener("click", clickCaseJoueur);
+
             } else {
-                colonne.addEventListener("click", lancerMissile);
+                colonne.addEventListener("click", () => {
+                    clickCaseAdversaire(i, j);
+                });
+
             }
 
             ligne.appendChild(colonne);
@@ -231,6 +209,42 @@ function initierTableaux(divId) {
 
     div.appendChild(table);
     document.body.appendChild(table);
+}
+
+//marche
+function clickCaseJoueur() {
+    if (cordonneeBateauMouse.length === bateaux[entiterSelectionner] && verifierBateauEstPlacable() && !partieEnCour) {
+        cordonneeBateauMouse.forEach(coordonnee => {
+
+            const cord = coordonnee.split('-')
+            const ligne = parseInt(cord[1], 10) - 1;
+            const colonne = cord[0].charCodeAt(0) - 65;
+            posBateauxJoueur[colonne][ligne] = true;
+
+            const caseElement = document.getElementById(coordonnee);
+            caseElement.classList.remove('caseNormal');
+            caseElement.classList.add('caseBateau');
+        });
+
+        delete bateaux[entiterSelectionner];
+
+        if (Object.values(bateaux).some(val => val !== 0)) {
+            placerPaletteBateaux();
+        } else {
+            const pallete = document.getElementById("divPlacerBateaux");
+
+            if (pallete) {
+                pallete.remove();
+                jouerPartie();
+            }
+        }
+    }
+}
+
+function clickCaseAdversaire(x, y) {
+    if(partieEnCour && tourJoueur && !missilesJoueur[x][y]) {
+        console.log("click");
+    }
 }
 
 // marche
@@ -260,7 +274,7 @@ function placerPaletteBateaux() {
         }
 
         bateau.addEventListener('click', () => {
-            bateauSelectionner = nom;
+            entiterSelectionner = nom;
         });
 
         paletteBateaux.appendChild(bateau);
@@ -293,7 +307,7 @@ function placerBateau(coordonnee) {
     const cord = coordonnee.split('-')
     let dansPlateau = true;
     if (directionPlacement) {
-        for (let j = 0; j < bateaux[bateauSelectionner]; j++) {
+        for (let j = 0; j < bateaux[entiterSelectionner]; j++) {
             const x = cord[0];
             const y = parseInt(cord[1], 10) + j;
             if (y > taillePlateau) {
@@ -304,7 +318,7 @@ function placerBateau(coordonnee) {
             cordonneeBateauMouse.push(`${x}-${y}`);
         }
     } else {
-        for (let i = 0; i < bateaux[bateauSelectionner]; i++) {
+        for (let i = 0; i < bateaux[entiterSelectionner]; i++) {
             const x = String.fromCharCode(cord[0].charCodeAt(0) + i);
             const y = parseInt(cord[1], 10);
 
@@ -336,7 +350,7 @@ function jouerPartie() {
         tourJoueur = Math.random() < 0.5;
         partieEnCour = true;
     }
-    console.log("start", tourJoueur);
+    
     if (!tourJoueur) {
         recevoirMissile().then(response => console.log(response.data?.data.coordonnee));
         tourJoueur = true;
@@ -344,9 +358,9 @@ function jouerPartie() {
 
 }
 
-function lancerMissile() {
+function lancerMissile(coordonnee) {
+    console.log("BOOM", coordonnee);
     if (tourJoueur) {
-        console.log("BOOM");
         tourJoueur = false;
         jouerPartie();
     }
