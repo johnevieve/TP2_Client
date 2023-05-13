@@ -1,9 +1,7 @@
 import './style.css';
 import axios from 'axios';
 
-const instanceAxios = axios.create({
-    baseURL: `http://localhost/api/battleship-ia/parties`
-});
+const instanceAxios = axios.create();
 
 let token;
 let url_api_joueur_ia;
@@ -91,6 +89,7 @@ async function nouvellePartie() {
     url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
     token = document.getElementById('jeton_joueur_ia').value;
 
+    instanceAxios.defaults.baseURL = url_api_joueur_ia;
     instanceAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     const config = {
