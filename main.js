@@ -1,6 +1,10 @@
 import './style.css';
 import axios from 'axios';
 
+const instanceAxios = axios.create({
+    baseURL: `http://localhost/api/battleship-ia/parties`
+});
+
 let token;
 let url_api_joueur_ia;
 
@@ -39,9 +43,9 @@ let bateauSelectionner = "";
 let cordonneeBateauMouse = [];
 
 // marche
-async function creationPartie() {
+async function creationPartie(config) {
     try {
-        return await axios.post(url_api_joueur_ia, { adversaire: nomAdversaire }, { headers: { "Authorization": `Bearer ${token}` } });
+        return await instanceAxios.post("/", config);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -49,7 +53,7 @@ async function creationPartie() {
 
 async function terminerPartie() {
     try {
-        return await axios.delete(url_api_joueur_ia + "/" + idPartie, { headers: { "Authorization": `Bearer ${token}` } });
+        return await instanceAxios.delete("/" + idPartie);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -57,7 +61,7 @@ async function terminerPartie() {
 
 async function recevoirMissile() {
     try {
-        return await axios.post(url_api_joueur_ia + "/" + idPartie + "/missiles", {}, { headers: { "Authorization": `Bearer ${token}` } });
+        return await instanceAxios.post("/" + idPartie + "/missiles");
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -66,10 +70,7 @@ async function recevoirMissile() {
 async function envoieResultatMissile(coordonnee) {
     try {
         let resultat = verifierPositionBateau(coordonnee);
-        const response = await axios.put(
-            url_api_joueur_ia + "/" + idPartie + "/missiles/" + coordonnee,
-            resultat,
-            { headers: { "Authorization": `Bearer ${token}` } });
+        return await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, resultat);
     } catch (error) {
         afficherMessageErreur(error);
     }
@@ -82,13 +83,19 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
 
 // marche
 async function nouvellePartie() {
-
+    
     nomJoueur = document.getElementById('nom_joueur').value;
     nomAdversaire = document.getElementById('nom_adversaire').value;
     url_api_joueur_ia = document.getElementById('url_api_joueur_ia').value;
     token = document.getElementById('jeton_joueur_ia').value;
 
-    creationPartie().then(
+    instanceAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    const config = {
+        adversaire: nomAdversaire
+    };
+
+    creationPartie(config).then(
         response => {
             idPartie = response?.data?.data?.id;
 
@@ -258,14 +265,23 @@ function placerPaletteBateaux() {
 }
 
 function jouerPartie() {
-    let partieEnCour = true; 
-    let tourJoueur = Math.random() < 0.5;
+    //let partieEnCour = true; 
+    //let tourJoueur = Math.random() < 0.5;
 
+    let missileRecu = false;
+    let missile = {}
 
+    if (!missileRecu) {
+        missile = recevoirMissile().then(response => { missileRecu = response.data.coordonnee});
+        missileRecu = true;
+    }
 
+    console.log(missileRecu);
+
+    //recevoirMissile().then(response => { console.log(response?.data?.coordonnee);})
+    /*
     do {
-
-        if(tourJoueur) {
+        if (tourJoueur) {
             for (let i = 0; i < taillePlateau; i++) {
                 for (let j = 0; j < taillePlateau; j++) {
                     if (!missilesJoueur[i][j]) {
@@ -275,11 +291,14 @@ function jouerPartie() {
                 }
             }
         } else {
-            recevoirMissile().then(response => { console.log(response?.data?.data);})
+            recevoirMissile().then(response => { console.log(response.data.coordonnee);})
         }
-        partieEnCour = false;
+        
+        tourJoueur = !tourJoueur;
+        //partieEnCour = false;
 
     } while (partieEnCour)
+    */
 }
 
 //marche
