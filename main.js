@@ -120,9 +120,18 @@ async function nouvellePartie() {
         response => {
             idPartie = response?.data?.data?.id;
 
-            bateauxAdversaire = response?.data?.data?.bateaux;
+            let bateauxEnvoyes = response?.data?.data?.bateaux;
+            bateauxAdversaire = {
+                porteAvions: bateauxEnvoyes['porte-avions'],
+                cuirasse: bateauxEnvoyes['cuirasse'],
+                destroyer: bateauxEnvoyes['destroyer'],
+                sousMarin: bateauxEnvoyes['sous-marin'],
+                patrouilleur: bateauxEnvoyes['patrouilleur']
+            };
+
 
             for (let i = 0; i < taillePlateau; i++) {
+
                 posBateauxAdversaire[i] = [];
                 posBateauxJoueur[i] = [];
                 missilesJoueur[i] = [];
@@ -275,7 +284,7 @@ function clickCaseAdversaire(colonne, ligne) {
 
         if (posBateauxAdversaire[colonne][ligne]) {
             caseJoueur.classList.add('caseToucher');
-            verifierEtatAdversaire(colonne, ligne);
+            verifierEtatAdversaire();
         } else {
             caseJoueur.classList.add('caseManquer');
         }
@@ -417,7 +426,7 @@ function verifierEtatJoueur(colonne, ligne) {
     let bateauSelectionner;
     for (const key in bateauxJoueur) {
         entiterSelectionner = key;
-        
+
         let bateautoucher = bateauxJoueur[entiterSelectionner]
 
         if (bateautoucher.includes(String.fromCharCode(colonne + 65) + '-' + (ligne + 1))) {
@@ -441,16 +450,19 @@ function verifierEtatJoueur(colonne, ligne) {
     return resultat[bateauSelectionner];
 }
 
-function verifierEtatAdversaire(colonne, ligne) {
+function verifierEtatAdversaire() {
     let estFinPartie = true;
-    for (const key in bateauxJoueur) {
-        let bateautoucher = bateauxAdversaire[key];
-        estFinPartie = estFinPartie && bateautoucher.every((coord) => missilesJoueur[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
+    for (const key in bateauxAdversaire) {
+        let bateauTouche = bateauxAdversaire[key];
+        estFinPartie = estFinPartie && bateauTouche.every((coord) => 
+        missilesJoueur[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
     }
+
     if (estFinPartie) {
         finPartie();
     }
 }
+
 
 // marche
 function verifierBateauEstPlacable() {
