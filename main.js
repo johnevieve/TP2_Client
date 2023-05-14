@@ -209,6 +209,15 @@ async function nouvellePartie() {
 // marche
 function initierTableaux(divId) {
     let div = document.createElement('div');
+
+    const nom = document.createElement('h2');
+    if(divId === "tableau_joueur") {
+        nom.innerText = `${nomJoueur}`;
+    } else {
+        nom.innerText = `${nomAdversaire}`;
+    }
+    div.appendChild(nom);
+
     const table = document.createElement("table");
     table.setAttribute("id", divId);
     const ligneLettre = document.createElement("tr");
@@ -264,7 +273,7 @@ function initierTableaux(divId) {
     }
 
     div.appendChild(table);
-    document.getElementById("tableaux").appendChild(table);
+    document.getElementById("tableaux").appendChild(div);
 }
 
 
@@ -379,7 +388,6 @@ function clickCaseAdversaire(colonne, ligne) {
 // marche
 function placerPaletteBateaux() {
     const paletteBateaux = document.getElementById("paletteBateaux");
-    paletteBateaux.setAttribute("id", "paletteBateaux")
     paletteBateaux.innerText = "";
 
     for (const [nom, taille] of Object.entries(bateaux)) {
@@ -427,8 +435,9 @@ function placerBateaux() {
     bouton.innerHTML = "&#x21b7;";
     bouton.addEventListener('click', changerDirectionPlacementBateau);
 
-    placerBateaux.appendChild(bouton);
+    
     placerBateaux.appendChild(paletteBateaux);
+    placerBateaux.appendChild(bouton);
     document.body.appendChild(placerBateaux);
 
     placerPaletteBateaux();
@@ -583,7 +592,7 @@ function verifierEtatAdversaire(colonne, ligne) {
                 if (divBateau) {
                     const carres = divBateau.querySelectorAll(".carre");
                     for (const carre of carres) {
-                        carre.style.backgroundColor = "red";
+                        carre.style.backgroundColor = "rgb(139, 8, 8)";
                     }
                 }
 
@@ -631,14 +640,17 @@ function afficherMessageErreur(error) {
     console.error(error);
 }
 
-function finPartie() {
+function finPartie(detail) {
     terminerPartie().then(resultat => {
         const body = document.querySelector('body');
         if (body) {
             body.innerHTML = '';
 
+            const divFinPartie = document.createElement('div');
+            divFinPartie.setAttribute('id', 'fin-partie');
+
             const p = document.createElement('p');
-            p.textContent = 'La partie est terminée !';
+            p.textContent = detail === 'Abandon' ? 'Vous avez abandonné la partie !' : `Le gagnant est ${detail} !`;
 
             const btnAccueil = document.createElement('button');
             btnAccueil.textContent = 'Accueil';
@@ -653,12 +665,11 @@ function finPartie() {
                 nouvellePartie();
             });
 
-            body.appendChild(p);
-            body.appendChild(rejouerBtn);
-            body.appendChild(btnAccueil);
+            divFinPartie.appendChild(p);
+            divFinPartie.appendChild(rejouerBtn);
+            divFinPartie.appendChild(btnAccueil);
 
+            body.appendChild(divFinPartie);
         }
     });
-
-
 }
