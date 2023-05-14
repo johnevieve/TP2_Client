@@ -125,13 +125,27 @@ input[type="submit"]:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 24px;
+  color: rgb(71, 70, 70);
+  text-shadow: 2px 2px 4px red;
+  background-color: #ffffff;
+  border: 1px solid #f00;
+  box-shadow: 0 0 5px #f00;
+  padding: 10px;
+}
+
+#message {
+  font-size: 30px;
+  color: black;
+  text-shadow: 2px 2px 4px red;
 }
 
 #info>div {
   margin-right: 20px;
 }
 
-#tableaux, #representationBateaux {
+#tableaux,
+#representationBateaux {
   margin-top: 20px;
   display: flex;
   justify-content: center;
@@ -146,7 +160,8 @@ input[type="submit"]:hover {
   margin-right: 50%;
 }
 
-#tableaux>*:last-child, #representationBateaux>*:last-child {
+#tableaux>*:last-child,
+#representationBateaux>*:last-child {
   margin-right: 0;
 }
 

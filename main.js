@@ -181,7 +181,7 @@ async function nouvellePartie() {
             const messageEl = document.createElement('div');
             messageEl.setAttribute("id", 'message');
             messageEl.innerHTML = "";
-            info.appendChild(messageEl);
+            document.body.appendChild(messageEl);
 
             const tableaux = document.createElement('div');
             tableaux.setAttribute("id", 'tableaux');
@@ -305,6 +305,8 @@ function clickCaseJoueur() {
                 partieEnCour = true;
                 if (!tourJoueur) {
                     tourAdversaire();
+                } else {
+                    document.getElementById('message').innerHTML = `Tour a ${nomJoueur}`;
                 }
             }
         }
@@ -350,8 +352,6 @@ function initialiserBateauPresenter(divId) {
 //marche
 function clickCaseAdversaire(colonne, ligne) {
     if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
-
-        document.getElementById('message').innerHTML = "";
         missilesJoueur[colonne][ligne] = true;
         const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
 
@@ -480,7 +480,7 @@ function placerBateau(coordonnee) {
 //marche
 function tourAdversaire() {
     if (!tourJoueur) {
-        document.getElementById('message').innerHTML = "";
+        document.getElementById('message').innerHTML = `Tour a ${nomAdversaire}`;
         setTimeout(() => {
             recevoirMissile().then(response => {
                 const coordonnee = response.data?.data.coordonnee;
@@ -513,6 +513,7 @@ function tourAdversaire() {
                     envoieResultatMissile(coordonnee, { 'resultat': resultat['à leau'] }).then();
                 }
             });
+            document.getElementById('message').innerHTML = `Tour a ${nomJoueur}`;
             tourJoueur = true;
         }, 800);
 
