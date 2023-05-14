@@ -15,14 +15,14 @@ let bateaux = {
 }
 
 const resultat = {
-    0: "à l'eau",
-    1: "touché",
-    2: "porte-avions coulé",
-    3: "cuirasse coulée",
-    4: "destroyer coulé",
-    5: "sous-marin coulé",
-    6: "patrouilleur coulé"
-}
+    "à leau": 0,
+    "touche": 1,
+    "porteAvions": 2,
+    "cuirasse": 3,
+    "destroyer": 4,
+    "sousMarin": 5,
+    "patrouilleur": 6
+};
 
 const taillePlateau = 10;
 
@@ -31,6 +31,21 @@ let nomJoueur;
 let nomAdversaire;
 let tourJoueur = null;
 
+let bateauxAdversaire = {
+    porteAvions: [],
+    cuirasse: [],
+    destroyer: [],
+    sousMarin: [],
+    patrouilleur: []
+}
+
+let bateauxJoueur = {
+    porteAvions: [],
+    cuirasse: [],
+    destroyer: [],
+    sousMarin: [],
+    patrouilleur: []
+}
 let posBateauxJoueur = []
 let posBateauxAdversaire = [];
 
@@ -59,6 +74,7 @@ async function terminerPartie() {
     }
 }
 
+//marche
 async function recevoirMissile() {
     try {
         return await instanceAxios.post("/" + idPartie + "/missiles");
@@ -67,16 +83,19 @@ async function recevoirMissile() {
     }
 }
 
+//marche
 async function envoieResultatMissile(coordonnee, resultat) {
     try {
         const response = await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, resultat);
-        
+
         return response;
     } catch (error) {
         afficherMessageErreur(error);
     }
 }
 
+
+//marche
 var button = document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
     nouvellePartie();
@@ -101,7 +120,7 @@ async function nouvellePartie() {
         response => {
             idPartie = response?.data?.data?.id;
 
-            let bateauxAdversaire = response?.data?.data?.bateaux;
+            bateauxAdversaire = response?.data?.data?.bateaux;
 
             for (let i = 0; i < taillePlateau; i++) {
                 posBateauxAdversaire[i] = [];
@@ -213,12 +232,15 @@ function initierTableaux(divId) {
 //marche
 function clickCaseJoueur() {
     if (cordonneeBateauMouse.length === bateaux[entiterSelectionner] && verifierBateauEstPlacable() && !partieEnCour) {
+        bateauxJoueur[entiterSelectionner].push(...cordonneeBateauMouse);
         cordonneeBateauMouse.forEach(coordonnee => {
 
             const cord = coordonnee.split('-')
             const ligne = parseInt(cord[1], 10) - 1;
             const colonne = cord[0].charCodeAt(0) - 65;
+
             posBateauxJoueur[colonne][ligne] = true;
+
 
             const caseElement = document.getElementById(coordonnee);
             caseElement.classList.remove('caseNormal');
@@ -236,7 +258,7 @@ function clickCaseJoueur() {
                 pallete.remove();
                 tourJoueur = Math.random() < 0.5;
                 partieEnCour = true;
-                if(!tourJoueur) {
+                if (!tourJoueur) {
                     tourAdversaire();
                 }
             }
@@ -247,20 +269,20 @@ function clickCaseJoueur() {
 function clickCaseAdversaire(colonne, ligne) {
     if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
         missilesJoueur[colonne][ligne] = true;
-
         const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
 
         caseJoueur.classList.remove('caseNormal');
 
         if (posBateauxAdversaire[colonne][ligne]) {
             caseJoueur.classList.add('caseToucher');
+            verifierEtatAdversaire(colonne, ligne);
         } else {
             caseJoueur.classList.add('caseManquer');
         }
 
         tourJoueur = false;
         tourAdversaire();
-        
+
     }
 }
 
@@ -365,34 +387,77 @@ function placerBateau(coordonnee) {
 function tourAdversaire() {
     if (!tourJoueur) {
         recevoirMissile().then(response => {
-            const cord = response.data?.data.coordonnee.split('-');
+            const coordonnee = response.data?.data.coordonnee;
+            const cord = coordonnee.split('-');
             const colonne = cord[0].charCodeAt(0) - 65;
             const ligne = parseInt(cord[1]) - 1;
             missilesAdversaire[colonne][ligne] = true;
 
-            const caseJoueur = document.querySelector('#tableau_joueur td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
+            const caseJoueur = document.querySelector('#tableau_joueur td#' +
+                String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
 
             caseJoueur.classList.remove('caseNormal');
 
 
             if (posBateauxJoueur[colonne][ligne]) {
                 caseJoueur.classList.add('caseToucher');
+                let retour = verifierEtatJoueur(colonne, ligne)
+                envoieResultatMissile(coordonnee, { 'resultat': retour }).then();
             } else {
                 caseJoueur.classList.add('caseManquer');
-                envoieResultatMissile(response.data?.data.coordonnee, { 'resultat': 0 }).then();
+                envoieResultatMissile(coordonnee, { 'resultat': resultat['à leau'] }).then();
             }
         });
         tourJoueur = true;
     }
 }
 
+function verifierEtatJoueur(colonne, ligne) {
+    let estFinPartie = true;
+    let bateauSelectionner;
+    for (const key in bateauxJoueur) {
+        entiterSelectionner = key;
+        
+        let bateautoucher = bateauxJoueur[entiterSelectionner]
+
+        if (bateautoucher.includes(String.fromCharCode(colonne + 65) + '-' + (ligne + 1))) {
+            bateauSelectionner = key;
+            for (let i = 0; i < bateautoucher.length; i++) {
+                let coord = bateautoucher[i].split('-');
+                const ligne = parseInt(coord[1], 10) - 1;
+                const colonne = coord[0].charCodeAt(0) - 65;
+                if (!missilesAdversaire[colonne][ligne]) {
+                    return resultat["touche"];
+                }
+            }
+        }
+        estFinPartie = estFinPartie && bateautoucher.every((coord) => missilesAdversaire[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
+    }
+
+    if (estFinPartie) {
+        finPartie();
+    }
+
+    return resultat[bateauSelectionner];
+}
+
+function verifierEtatAdversaire(colonne, ligne) {
+    let estFinPartie = true;
+    for (const key in bateauxJoueur) {
+        let bateautoucher = bateauxAdversaire[key];
+        estFinPartie = estFinPartie && bateautoucher.every((coord) => missilesJoueur[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
+    }
+    if (estFinPartie) {
+        finPartie();
+    }
+}
 
 // marche
 function verifierBateauEstPlacable() {
     for (const coordonnee of cordonneeBateauMouse) {
-        const cord = coordonnee.split('-');
-        const ligne = parseInt(cord[1], 10) - 1;
-        const colonne = cord[0].charCodeAt(0) - 65;
+        const coord = coordonnee.split('-');
+        const ligne = parseInt(coord[1], 10) - 1;
+        const colonne = coord[0].charCodeAt(0) - 65;
 
         if (posBateauxJoueur[colonne][ligne]) {
             return false;
@@ -401,7 +466,6 @@ function verifierBateauEstPlacable() {
 
     return true;
 }
-
 
 // marche 
 function changerDirectionPlacementBateau() {
@@ -413,4 +477,8 @@ function changerDirectionPlacementBateau() {
 function afficherMessageErreur(error) {
     document.getElementById("error_message").innerHTML = error.message;
     console.error(error);
+}
+
+function finPartie() {
+    console.log("RIP");
 }
