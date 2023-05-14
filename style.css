@@ -27,7 +27,22 @@ tr:first-child th {
   margin-bottom: 10px;
 }
 
+.afficherBateaux {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+  }
+
 .choixBateau {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+  padding: 0;
+}
+
+
+
+.listeBateau {
   display: flex;
   flex-direction: row;
   margin: 10px;
