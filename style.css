@@ -24,7 +24,7 @@ background: #2980b9;
 }
 
 .caseNormal {
-  background-color: rgba(10, 72, 187, 0.342);
+  background-color: rgba(7, 49, 128, 0.342);
 }
 
 .caseBateau {
@@ -32,11 +32,11 @@ background: #2980b9;
 }
 
 .caseManquer {
-  background-color: white;
+  background-color: rgba(53, 113, 202, 0.404);
 }
 
 .caseToucher {
-  background-color: darkred;
+  background-color: rgb(139, 8, 8);
 }
 
 table {

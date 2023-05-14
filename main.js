@@ -547,7 +547,7 @@ function verifierEtatJoueur(colonne, ligne) {
                 if (divBateau) {
                     const carres = divBateau.querySelectorAll(".carre");
                     for (const carre of carres) {
-                        carre.style.backgroundColor = "red";
+                        carre.style.backgroundColor = "rgb(139, 8, 8)";
                     }
                 }
 
