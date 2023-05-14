@@ -108,7 +108,7 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
 
 // marche
 async function nouvellePartie() {
-
+    entiterSelectionner = "";
     const config = {
         adversaire: nomAdversaire
     };
@@ -158,7 +158,7 @@ async function nouvellePartie() {
             if (document.getElementById("formulaire")) {
                 document.getElementById("formulaire").remove();
             }
-                
+
             const info = document.createElement('div');
             info.setAttribute("id", 'info');
             document.body.insertBefore(info, document.body.firstChild);
@@ -183,8 +183,16 @@ async function nouvellePartie() {
             messageEl.innerHTML = "";
             info.appendChild(messageEl);
 
+            const tableaux = document.createElement('div');
+            tableaux.setAttribute("id", 'tableaux');
+            document.body.appendChild(tableaux);
+
             initierTableaux("tableau_joueur");
             initierTableaux("tableau_adversaire");
+
+            const representationBateaux = document.createElement('div');
+            representationBateaux.setAttribute("id", 'representationBateaux');
+            document.body.appendChild(representationBateaux);
 
             placerBateaux();
 
@@ -256,7 +264,7 @@ function initierTableaux(divId) {
     }
 
     div.appendChild(table);
-    document.body.appendChild(table);
+    document.getElementById("tableaux").appendChild(table);
 }
 
 
@@ -336,12 +344,13 @@ function initialiserBateauPresenter(divId) {
         listebateau.appendChild(bateau);
     }
 
-    document.body.appendChild(listebateau);
+    document.getElementById('representationBateaux').appendChild(listebateau);
 }
 
 //marche
 function clickCaseAdversaire(colonne, ligne) {
     if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
+
         document.getElementById('message').innerHTML = "";
         missilesJoueur[colonne][ligne] = true;
         const caseJoueur = document.querySelector('#tableau_adversaire td#' + String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
@@ -364,13 +373,13 @@ function clickCaseAdversaire(colonne, ligne) {
 
         tourJoueur = false;
         tourAdversaire();
-
     }
 }
 
 // marche
 function placerPaletteBateaux() {
     const paletteBateaux = document.getElementById("paletteBateaux");
+    paletteBateaux.setAttribute("id", "paletteBateaux")
     paletteBateaux.innerText = "";
 
     for (const [nom, taille] of Object.entries(bateaux)) {
@@ -472,38 +481,41 @@ function placerBateau(coordonnee) {
 function tourAdversaire() {
     if (!tourJoueur) {
         document.getElementById('message').innerHTML = "";
-        recevoirMissile().then(response => {
-            const coordonnee = response.data?.data.coordonnee;
-            const cord = coordonnee.split('-');
-            const colonne = cord[0].charCodeAt(0) - 65;
-            const ligne = parseInt(cord[1]) - 1;
+        setTimeout(() => {
+            recevoirMissile().then(response => {
+                const coordonnee = response.data?.data.coordonnee;
+                const cord = coordonnee.split('-');
+                const colonne = cord[0].charCodeAt(0) - 65;
+                const ligne = parseInt(cord[1]) - 1;
 
-            missilesAdversaire[colonne][ligne] = true;
+                missilesAdversaire[colonne][ligne] = true;
 
-            const caseJoueur = document.querySelector('#tableau_joueur td#' +
-                String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
+                const caseJoueur = document.querySelector('#tableau_joueur td#' +
+                    String.fromCharCode(colonne + 65) + '-' + (ligne + 1));
 
-            caseJoueur.classList.remove('caseNormal');
+                caseJoueur.classList.remove('caseNormal');
 
 
-            if (posBateauxJoueur[colonne][ligne]) {
-                for (const [nomBateau, positions] of Object.entries(bateauxJoueur)) {
-                    for (const [index, [position, bool]] of positions.entries()) {
-                        if (position === String.fromCharCode(colonne + 65) + '-' + (ligne + 1)) {
-                            bateauxJoueur[nomBateau][index][1] = true;
+                if (posBateauxJoueur[colonne][ligne]) {
+                    for (const [nomBateau, positions] of Object.entries(bateauxJoueur)) {
+                        for (const [index, [position, bool]] of positions.entries()) {
+                            if (position === String.fromCharCode(colonne + 65) + '-' + (ligne + 1)) {
+                                bateauxJoueur[nomBateau][index][1] = true;
+                            }
                         }
                     }
-                }
-                caseJoueur.classList.add('caseToucher');
+                    caseJoueur.classList.add('caseToucher');
 
-                let retour = verifierEtatJoueur(colonne, ligne);
-                envoieResultatMissile(coordonnee, { 'resultat': retour }).then();
-            } else {
-                caseJoueur.classList.add('caseManquer');
-                envoieResultatMissile(coordonnee, { 'resultat': resultat['à leau'] }).then();
-            }
-        });
-        tourJoueur = true;
+                    let retour = verifierEtatJoueur(colonne, ligne);
+                    envoieResultatMissile(coordonnee, { 'resultat': retour }).then();
+                } else {
+                    caseJoueur.classList.add('caseManquer');
+                    envoieResultatMissile(coordonnee, { 'resultat': resultat['à leau'] }).then();
+                }
+            });
+            tourJoueur = true;
+        }, 800);
+
     }
 }
 

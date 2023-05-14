@@ -1,3 +1,42 @@
+.afficherBateaux {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-bottom: 10px;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f2f2f2;
+  margin: 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.choixBateau {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+  padding: 0;
+}
+
+.caseNormal {
+  background-color: blue;
+}
+
+.caseBateau {
+  background-color: gray;
+}
+
+.caseManquer {
+  background-color: white;
+}
+
+.caseToucher {
+  background-color: darkred;
+}
+
 table {
   border-collapse: collapse;
 }
@@ -21,26 +60,48 @@ tr:first-child th {
   border-top: none;
 }
 
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-bottom: 20px;
+  width: 300px;
+  max-width: 100%;
+}
+
+input[type="submit"] {
+  background-color: #396afc;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #2948ff;
+}
+
 #paletteBateaux {
   display: flex;
   flex-wrap: nowrap;
   margin-bottom: 10px;
 }
-
-.afficherBateaux {
-    display: flex;
-    flex-wrap: nowrap;
-    margin-bottom: 10px;
-  }
-
-.choixBateau {
-  display: flex;
-  flex-direction: row;
-  margin: 10px;
-  padding: 0;
-}
-
-
 
 .listeBateau {
   display: flex;
@@ -59,18 +120,36 @@ tr:first-child th {
   box-sizing: border-box;
 }
 
-.caseNormal {
-  background-color: blue;
+
+#info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.caseBateau {
-  background-color: gray;
+#info>div {
+  margin-right: 20px;
 }
 
-.caseManquer {
-  background-color: white;
+#tableaux, #representationBateaux {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
 }
 
-.caseToucher {
-  background-color: darkred;
+#tableaux>* {
+  margin-right: 5%;
+}
+
+#representationBateaux>* {
+  margin-right: 50%;
+}
+
+#tableaux>*:last-child, #representationBateaux>*:last-child {
+  margin-right: 0;
+}
+
+.afficherBateaux {
+  border: 1px solid black;
 }
