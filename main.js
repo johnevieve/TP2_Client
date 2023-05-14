@@ -52,7 +52,12 @@ let entiterSelectionner = "";
 let cordonneeBateauMouse = [];
 let partieEnCour = false;
 
-// marche
+/**
+ * Appel d'axios pour la création d'une partie.
+ * 
+ * @param {*} config Nom de l'adversaire
+ * @returns          Reponce ou message d'une erreur
+ */
 async function creationPartie(config) {
     try {
         return await instanceAxios.post("/", config);
@@ -61,7 +66,11 @@ async function creationPartie(config) {
     }
 }
 
-//marche
+/**
+ * Appel d'axios pour la terminaison d'une partie.
+ * 
+ * @returns     Reponce ou message d'une erreur
+ */
 async function terminerPartie() {
     try {
         return await instanceAxios.delete("/" + idPartie);
@@ -70,7 +79,11 @@ async function terminerPartie() {
     }
 }
 
-//marche
+/**
+ * Appel d'axios pour recevoir un missile du joueur IA.
+ * 
+ * @returns     Reponce ou message d'une erreur
+ */
 async function recevoirMissile() {
     try {
         return await instanceAxios.post("/" + idPartie + "/missiles");
@@ -79,7 +92,13 @@ async function recevoirMissile() {
     }
 }
 
-//marche
+/**
+ * Appel d'axios pour l'envoie du résultat d'un missile du joueur IA.
+ * 
+ * @param {*} coordonnee    Coordonnée du missile
+ * @param {*} resultat      Résultat du missile envoyer
+ * @returns 
+ */
 async function envoieResultatMissile(coordonnee, resultat) {
     try {
         const response = await instanceAxios.put("/" + idPartie + "/missiles/" + coordonnee, resultat);
@@ -90,8 +109,9 @@ async function envoieResultatMissile(coordonnee, resultat) {
     }
 }
 
-
-//marche
+/**
+ * Bouton pour démarré une partie après avoir reçu tous les informations nécéssaires.
+ */
 var button = document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -106,7 +126,9 @@ var button = document.querySelector('form').addEventListener('submit', (event) =
     nouvellePartie();
 });
 
-// marche
+/**
+ * Fonction pour initier une nouvelle partie.
+ */
 async function nouvellePartie() {
     entiterSelectionner = "";
     const config = {
@@ -206,7 +228,11 @@ async function nouvellePartie() {
     );
 }
 
-// marche
+/**
+ * Fonction qui initie un tableau pour le joueur ou l'IA.
+ * 
+ * @param {*} divId     Id de la div.
+ */
 function initierTableaux(divId) {
     let div = document.createElement('div');
 
@@ -276,8 +302,9 @@ function initierTableaux(divId) {
     document.getElementById("tableaux").appendChild(div);
 }
 
-
-//marche
+/**
+ * Fonction pour l'event listener pour le placage des bateaux.
+ */
 function clickCaseJoueur() {
     if (cordonneeBateauMouse.length === bateaux[entiterSelectionner] && verifierBateauEstPlacable() && !partieEnCour) {
         const cordonneesBateauTuples = cordonneeBateauMouse.map((coord) => [coord, false]);
@@ -290,7 +317,6 @@ function clickCaseJoueur() {
             const colonne = cord[0].charCodeAt(0) - 65;
 
             posBateauxJoueur[colonne][ligne] = true;
-
 
             const caseElement = document.getElementById(coordonnee);
             caseElement.classList.remove('caseNormal');
@@ -322,7 +348,11 @@ function clickCaseJoueur() {
     }
 }
 
-//marche
+/**
+ * Fonction de la présentation des bateaux placable.
+ * 
+ * @param {*} divId     Id de la div.
+ */
 function initialiserBateauPresenter(divId) {
     const listebateau = document.createElement("div");
     listebateau.setAttribute("id", divId);
@@ -358,7 +388,13 @@ function initialiserBateauPresenter(divId) {
     document.getElementById('representationBateaux').appendChild(listebateau);
 }
 
-//marche
+/**
+ * Fonction pour l'event listener pour le lencement d'un missile 
+ * vers une case du tableau de adversaire et le tour par tour.
+ * 
+ * @param {*} colonne   Position numéric
+ * @param {*} ligne     Position lettre
+ */
 function clickCaseAdversaire(colonne, ligne) {
     if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
         missilesJoueur[colonne][ligne] = true;
@@ -385,7 +421,9 @@ function clickCaseAdversaire(colonne, ligne) {
     }
 }
 
-// marche
+/**
+ * Fonction pour l'affichage des palettes de bateau non placé.
+ */
 function placerPaletteBateaux() {
     const paletteBateaux = document.getElementById("paletteBateaux");
     paletteBateaux.innerText = "";
@@ -421,7 +459,9 @@ function placerPaletteBateaux() {
     }
 }
 
-//marche
+/**
+ * Fonction pour l'affichage des palettes de bateau non placé après un changement de direction..
+ */
 function placerBateaux() {
     const placerBateaux = document.createElement('div');
     placerBateaux.setAttribute("id", "divPlacerBateaux");
@@ -443,7 +483,11 @@ function placerBateaux() {
     placerPaletteBateaux();
 }
 
-//marche
+/**
+ * Fonction pour le placement d'un bateau une fois la case est cliqué.
+ * 
+ * @param {*} coordonnee    Coordonnée du bateau.
+ */
 function placerBateau(coordonnee) {
     const cord = coordonnee.split('-')
     let dansPlateau = true;
@@ -451,6 +495,7 @@ function placerBateau(coordonnee) {
         for (let j = 0; j < bateaux[entiterSelectionner]; j++) {
             const x = cord[0];
             const y = parseInt(cord[1], 10) + j;
+
             if (y > taillePlateau) {
                 dansPlateau = false;
                 break;
@@ -486,7 +531,9 @@ function placerBateau(coordonnee) {
 
 }
 
-//marche
+/**
+ * Fonction pour l'envoie du résultat du missile quand ce n'est pas le tour du joueur.
+ */
 function tourAdversaire() {
     if (!tourJoueur) {
         document.getElementById('message').innerHTML = `Tour a ${nomAdversaire}`;
@@ -529,7 +576,14 @@ function tourAdversaire() {
     }
 }
 
-//marche
+/**
+ * Fonction pour la vérification de l'état du joueur après la fin d'une partie 
+ * quand les conditions sont remplies ou bien renvoie un message du bateau coulé.
+ * 
+ * @param {*} colonne   Position numéric
+ * @param {*} ligne     Position lettre
+ * @returns             Résultat
+ */
 function verifierEtatJoueur(colonne, ligne) {
     let estFinPartie = true;
     let bateauSelectionne;
@@ -573,8 +627,13 @@ function verifierEtatJoueur(colonne, ligne) {
     return resultat[bateauSelectionne];
 }
 
-
-//marche
+/**
+ * Fonction pour la vérification de l'état de adversaire après la fin d'une partie 
+ * quand les conditions sont remplies ou bien renvoie un message du bateau coulé.
+ * 
+ * @param {*} colonne   Position numéric
+ * @param {*} ligne     Position lettre
+ */
 function verifierEtatAdversaire(colonne, ligne) {
     let estFinPartie = true;
     let bateauSelectionne;
@@ -613,7 +672,11 @@ function verifierEtatAdversaire(colonne, ligne) {
 
 }
 
-// marche
+/**
+ * Fonction qui vérifie si un bateau peu-être placé dans le tableau du joueur.
+ * 
+ * @returns vrai ou faux.
+ */
 function verifierBateauEstPlacable() {
     for (const coordonnee of cordonneeBateauMouse) {
         const coord = coordonnee.split('-');
@@ -628,18 +691,29 @@ function verifierBateauEstPlacable() {
     return true;
 }
 
-// marche 
+/**
+ * Fonction qui change le boolean pour la direction du placement d'un bateau du joueur.
+ */
 function changerDirectionPlacementBateau() {
     directionPlacement = !directionPlacement;
     placerPaletteBateaux();
 }
 
-// marche 
+/**
+ * Fonction pour l'affichage d'un mesage d'un erreur.
+ * 
+ * @param {*} error Message de l'erreur.
+ */
 function afficherMessageErreur(error) {
     document.getElementById("error_message").innerHTML = error.message;
     console.error(error);
 }
 
+/**
+ * Fonction pour terminé une partie avec les détails de la partie.
+ * 
+ * @param {*} detail    Détail de la partie.
+ */
 function finPartie(detail) {
     terminerPartie().then(resultat => {
         const body = document.querySelector('body');
