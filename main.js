@@ -6,13 +6,7 @@ const instanceAxios = axios.create();
 let token;
 let url_api_joueur_ia;
 
-let bateaux = {
-    porteAvions: 5,
-    cuirasse: 4,
-    destroyer: 3,
-    sousMarin: 3,
-    patrouilleur: 2
-}
+let bateaux;
 
 const resultat = {
     "à leau": 0,
@@ -66,6 +60,7 @@ async function creationPartie(config) {
     }
 }
 
+//marche
 async function terminerPartie() {
     try {
         return await instanceAxios.delete("/" + idPartie);
@@ -98,11 +93,6 @@ async function envoieResultatMissile(coordonnee, resultat) {
 //marche
 var button = document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
-    nouvellePartie();
-});
-
-// marche
-async function nouvellePartie() {
 
     nomJoueur = document.getElementById('nom_joueur').value;
     nomAdversaire = document.getElementById('nom_adversaire').value;
@@ -112,9 +102,23 @@ async function nouvellePartie() {
     instanceAxios.defaults.baseURL = url_api_joueur_ia;
     instanceAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+    nouvellePartie();
+});
+
+// marche
+async function nouvellePartie() {
+
     const config = {
         adversaire: nomAdversaire
     };
+
+    bateaux = {
+        porteAvions: 5,
+        cuirasse: 4,
+        destroyer: 3,
+        sousMarin: 3,
+        patrouilleur: 2
+    }
 
     creationPartie(config).then(
         response => {
@@ -151,7 +155,8 @@ async function nouvellePartie() {
                 }
             }
 
-            document.getElementById("formulaire").remove();
+            if (document.getElementById("formulaire"))
+                document.getElementById("formulaire").remove();
 
             const idPartieEl = document.createElement('div');
             idPartieEl.innerHTML = "Partie ID : " + idPartie;
@@ -171,7 +176,9 @@ async function nouvellePartie() {
 
             const bouton = document.createElement('button');
             bouton.innerHTML = "Terminée Partie";
-            bouton.onclick = terminerPartie;
+            bouton.addEventListener("click", () => {
+                finPartie("Abandon");
+            });
             document.body.appendChild(bouton);
         }
     );
@@ -275,6 +282,7 @@ function clickCaseJoueur() {
     }
 }
 
+//marche
 function clickCaseAdversaire(colonne, ligne) {
     if (partieEnCour && tourJoueur && !missilesJoueur[colonne][ligne]) {
         missilesJoueur[colonne][ligne] = true;
@@ -393,6 +401,7 @@ function placerBateau(coordonnee) {
 
 }
 
+//marche
 function tourAdversaire() {
     if (!tourJoueur) {
         recevoirMissile().then(response => {
@@ -421,6 +430,7 @@ function tourAdversaire() {
     }
 }
 
+//marche
 function verifierEtatJoueur(colonne, ligne) {
     let estFinPartie = true;
     let bateauSelectionner;
@@ -444,22 +454,23 @@ function verifierEtatJoueur(colonne, ligne) {
     }
 
     if (estFinPartie) {
-        finPartie();
+        finPartie(nomAdversaire);
     }
 
     return resultat[bateauSelectionner];
 }
 
+//marche
 function verifierEtatAdversaire() {
     let estFinPartie = true;
     for (const key in bateauxAdversaire) {
         let bateauTouche = bateauxAdversaire[key];
-        estFinPartie = estFinPartie && bateauTouche.every((coord) => 
-        missilesJoueur[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
+        estFinPartie = estFinPartie && bateauTouche.every((coord) =>
+            missilesJoueur[coord[0].charCodeAt(0) - 65][parseInt(coord[2], 10) - 1] === true);
     }
 
     if (estFinPartie) {
-        finPartie();
+        finPartie(nomJoueur);
     }
 }
 
@@ -492,5 +503,33 @@ function afficherMessageErreur(error) {
 }
 
 function finPartie() {
-    console.log("RIP");
+    terminerPartie().then(resultat => {
+        const body = document.querySelector('body');
+        if (body) {
+            body.innerHTML = '';
+
+            const p = document.createElement('p');
+            p.textContent = 'La partie est terminée !';
+
+            const btnAccueil = document.createElement('button');
+            btnAccueil.textContent = 'Accueil';
+            btnAccueil.addEventListener('click', () => {
+                window.location.reload();
+            });
+
+            const rejouerBtn = document.createElement("button");
+            rejouerBtn.textContent = "Rejouer";
+            rejouerBtn.addEventListener("click", () => {
+                body.innerHTML = '';
+                nouvellePartie();
+            });
+
+            body.appendChild(p);
+            body.appendChild(rejouerBtn);
+            body.appendChild(btnAccueil);
+
+        }
+    });
+
+
 }
